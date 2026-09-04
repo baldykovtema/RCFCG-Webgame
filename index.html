@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Кубы</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #111;
+    font-family: Arial, sans-serif;
+}
+
+#gameArea {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+
+    width: 92vw;
+    height: 88vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#cubes {
+    display: grid;
+    justify-content: center;
+    align-content: center;
+    gap: 10px;
+}
+
+.cube {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    background: #000;
+    overflow: hidden;
+}
+
+canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#controls {
+    position: fixed;
+    left: 20px;
+    bottom: 20px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    z-index: 100;
+}
+
+button {
+    border: none;
+    border-radius: 8px;
+
+    padding: 12px 18px;
+
+    font-size: 16px;
+    font-weight: bold;
+
+    color: white;
+    background: #333;
+
+    cursor: pointer;
+}
+
+button:hover {
+    filter: brightness(1.2);
+}
+
+button:disabled {
+    opacity: 0.4;
+    cursor: default;
+}
+
+#addCube {
+    background: #246bce;
+}
+
+#removeCube {
+    background: #b52b2b;
+}
+
+#restart {
+    background: #444;
+}
+</style>
+</head>
+
+<body>
+
+<div id="gameArea">
+    <div id="cubes"></div>
+</div>
+
+<div id="controls">
+
+    <button id="addCube">
+        Добавить куб 1/21
+    </button>
+
+    <button id="removeCube" style="display: none;">
+        Убрать куб
+    </button>
+
+    <button id="restart">
+        Заново
+    </button>
+
+</div>
+
+<script>
+
+const MAX_CUBES = 21;
+
+const LINE_COUNT = 80;
+
+const FILL_TIME = 3000;
+
+const GAP = 10;
+
+
+const cubesContainer =
+    document.getElementById("cubes");
+
+const addButton =
+    document.getElementById("addCube");
+
+const removeButton =
+    document.getElementById("removeCube");
+
+const restartButton =
+    document.getElementById("restart");
+
+
+let cubes = [];
+
+
+/* =================================
+   СЛУЧАЙНЫЙ ЦВЕТ
+================================= */
+
+function randomColor() {
+
+    const hue =
+        Math.floor(Math.random() * 360);
+
+    const saturation =
+        75 + Math.random() * 25;
+
+    const lightness =
+        50 + Math.random() * 20;
+
+    return `hsl(${hue}, ${saturation}%, ${lightness}%)`;
+}
+
+
+/* =================================
+   НОВЫЕ ЦВЕТА
+================================= */
+
+function generateColors() {
+
+    const colors = [];
+
+    for (
+        let i = 0;
+        i < LINE_COUNT;
+        i++
+    ) {
+
+        colors.push(
+            randomColor()
+        );
+    }
+
+    return colors;
+}
+
+
+/* =================================
+   СОЗДАНИЕ КУБА
+================================= */
+
+function createCube() {
+
+    const cube =
+        document.createElement("div");
+
+    cube.className = "cube";
+
+
+    const canvas =
+        document.createElement("canvas");
+
+
+    cube.appendChild(canvas);
+
+    cubesContainer.appendChild(cube);
+
+
+    const data = {
+
+        element: cube,
+
+        canvas: canvas,
+
+        colors:
+            generateColors(),
+
+        progress: 0,
+
+        animation: null
+    };
+
+
+    cubes.push(data);
+
+    resizeCube(data);
+
+    return data;
+}
+
+
+/* =================================
+   РАЗМЕР КУБА
+================================= */
+
+function resizeCube(data) {
+
+    const rect =
+        data.element.getBoundingClientRect();
+
+
+    if (
+        rect.width <= 0 ||
+        rect.height <= 0
+    ) {
+
+        return;
+    }
+
+
+    const size =
+        Math.floor(
+            Math.min(
+                rect.width,
+                rect.height
+            )
+        );
+
+
+    data.canvas.width =
+        size;
+
+    data.canvas.height =
+        size;
+
+
+    drawCube(
+        data,
+        data.progress
+    );
+}
+
+
+/* =================================
+   РИСОВАНИЕ
+================================= */
+
+function drawCube(
+    data,
+    progress
+) {
+
+    const canvas =
+        data.canvas;
+
+
+    const ctx =
+        canvas.getContext("2d");
+
+
+    const size =
+        canvas.width;
+
+
+    if (size <= 0) {
+        return;
+    }
+
+
+    ctx.clearRect(
+        0,
+        0,
+        size,
+        size
+    );
+
+
+    const center =
+        size / 2;
+
+
+    /* =============================
+       ЛЕВО
+    ============================= */
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.moveTo(0, 0);
+
+    ctx.lineTo(
+        center,
+        center
+    );
+
+    ctx.lineTo(
+        0,
+        size
+    );
+
+    ctx.closePath();
+
+    ctx.clip();
+
+
+    const lineHeight =
+        size / LINE_COUNT;
+
+
+    for (
+        let i = 0;
+        i < LINE_COUNT;
+        i++
+    ) {
+
+        const y =
+            i * lineHeight;
+
+
+        const maxX =
+            center *
+            (
+                1 -
+                Math.abs(
+                    y +
+                    lineHeight / 2 -
+                    center
+                ) / center
+            );
+
+
+        const currentX =
+            maxX * progress;
+
+
+        ctx.fillStyle =
+            data.colors[i];
+
+
+        ctx.fillRect(
+            0,
+            y,
+            currentX,
+            lineHeight + 1
+        );
+    }
+
+
+    ctx.restore();
+
+
+    /* =============================
+       ПРАВО
+    ============================= */
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        size,
+        0
+    );
+
+    ctx.lineTo(
+        center,
+        center
+    );
+
+    ctx.lineTo(
+        size,
+        size
+    );
+
+    ctx.closePath();
+
+    ctx.clip();
+
+
+    for (
+        let i = 0;
+        i < LINE_COUNT;
+        i++
+    ) {
+
+        const y =
+            i * lineHeight;
+
+
+        const maxX =
+            center *
+            (
+                1 -
+                Math.abs(
+                    y +
+                    lineHeight / 2 -
+                    center
+                ) / center
+            );
+
+
+        const currentX =
+            maxX * progress;
+
+
+        ctx.fillStyle =
+            data.colors[
+                (i + 20) %
+                LINE_COUNT
+            ];
+
+
+        ctx.fillRect(
+            size - currentX,
+            y,
+            currentX,
+            lineHeight + 1
+        );
+    }
+
+
+    ctx.restore();
+
+
+    /* =============================
+       ВЕРХ
+    ============================= */
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        0
+    );
+
+    ctx.lineTo(
+        size,
+        0
+    );
+
+    ctx.lineTo(
+        center,
+        center
+    );
+
+    ctx.closePath();
+
+    ctx.clip();
+
+
+    const lineWidth =
+        size / LINE_COUNT;
+
+
+    for (
+        let i = 0;
+        i < LINE_COUNT;
+        i++
+    ) {
+
+        const x =
+            i * lineWidth;
+
+
+        const maxY =
+            center *
+            (
+                1 -
+                Math.abs(
+                    x +
+                    lineWidth / 2 -
+                    center
+                ) / center
+            );
+
+
+        const currentY =
+            maxY * progress;
+
+
+        ctx.fillStyle =
+            data.colors[
+                (i + 40) %
+                LINE_COUNT
+            ];
+
+
+        ctx.fillRect(
+            x,
+            0,
+            lineWidth + 1,
+            currentY
+        );
+    }
+
+
+    ctx.restore();
+
+
+    /* =============================
+       НИЗ
+    ============================= */
+
+    ctx.save();
+
+    ctx.beginPath();
+
+    ctx.moveTo(
+        0,
+        size
+    );
+
+    ctx.lineTo(
+        center,
+        center
+    );
+
+    ctx.lineTo(
+        size,
+        size
+    );
+
+    ctx.closePath();
+
+    ctx.clip();
+
+
+    for (
+        let i = 0;
+        i < LINE_COUNT;
+        i++
+    ) {
+
+        const x =
+            i * lineWidth;
+
+
+        const maxY =
+            center *
+            (
+                1 -
+                Math.abs(
+                    x +
+                    lineWidth / 2 -
+                    center
+                ) / center
+            );
+
+
+        const currentY =
+            maxY * progress;
+
+
+        ctx.fillStyle =
+            data.colors[
+                (i + 60) %
+                LINE_COUNT
+            ];
+
+
+        ctx.fillRect(
+            x,
+            size - currentY,
+            lineWidth + 1,
+            currentY
+        );
+    }
+
+
+    ctx.restore();
+
+
+    /* =============================
+       ЦЕНТР
+    ============================= */
+
+    if (progress >= 1) {
+
+        ctx.fillStyle =
+            "#fff";
+
+
+        ctx.beginPath();
+
+        ctx.arc(
+            center,
+            center,
+            2,
+            0,
+            Math.PI * 2
+        );
+
+        ctx.fill();
+    }
+}
+
+
+/* =================================
+   АНИМАЦИЯ
+================================= */
+
+function animateCube(data) {
+
+    if (data.animation) {
+
+        cancelAnimationFrame(
+            data.animation
+        );
+    }
+
+
+    const start =
+        performance.now();
+
+
+    function frame(now) {
+
+        const elapsed =
+            now - start;
+
+
+        data.progress =
+            Math.min(
+                elapsed / FILL_TIME,
+                1
+            );
+
+
+        drawCube(
+            data,
+            data.progress
+        );
+
+
+        if (
+            data.progress < 1
+        ) {
+
+            data.animation =
+                requestAnimationFrame(
+                    frame
+                );
+
+        } else {
+
+            data.animation =
+                null;
+        }
+    }
+
+
+    data.progress = 0;
+
+
+    data.animation =
+        requestAnimationFrame(
+            frame
+        );
+}
+
+
+/* =================================
+   РАСКЛАДКА
+================================= */
+
+function updateLayout() {
+
+    const count =
+        cubes.length;
+
+
+    if (count === 0) {
+        return;
+    }
+
+
+    const gameArea =
+        document.getElementById(
+            "gameArea"
+        );
+
+
+    const areaWidth =
+        gameArea.clientWidth;
+
+
+    const areaHeight =
+        gameArea.clientHeight;
+
+
+    let bestColumns = 1;
+
+    let bestRows = count;
+
+    let bestSize = 0;
+
+
+    for (
+        let columns = 1;
+        columns <= count;
+        columns++
+    ) {
+
+        const rows =
+            Math.ceil(
+                count / columns
+            );
+
+
+        const width =
+            (
+                areaWidth -
+                GAP *
+                (columns - 1)
+            ) / columns;
+
+
+        const height =
+            (
+                areaHeight -
+                GAP *
+                (rows - 1)
+            ) / rows;
+
+
+        const size =
+            Math.floor(
+                Math.min(
+                    width,
+                    height
+                )
+            );
+
+
+        if (
+            size > bestSize
+        ) {
+
+            bestSize =
+                size;
+
+            bestColumns =
+                columns;
+
+            bestRows =
+                rows;
+        }
+    }
+
+
+    cubesContainer.style.gridTemplateColumns =
+        `repeat(${bestColumns}, ${bestSize}px)`;
+
+
+    cubesContainer.style.gridTemplateRows =
+        `repeat(${bestRows}, ${bestSize}px)`;
+
+
+    cubes.forEach(
+        cube => {
+            resizeCube(cube);
+        }
+    );
+}
+
+
+/* =================================
+   КНОПКИ
+================================= */
+
+function updateButtons() {
+
+    const count =
+        cubes.length;
+
+
+    if (
+        count < MAX_CUBES
+    ) {
+
+        /*
+           1 куб  → 1/21
+           2 куба → 2/21
+           ...
+           20 кубов → 20/21
+        */
+
+        addButton.textContent =
+            `Добавить куб ${count}/21`;
+
+
+        addButton.disabled =
+            false;
+
+    } else {
+
+        addButton.textContent =
+            "Добавить куб 21/21";
+
+
+        addButton.disabled =
+            true;
+    }
+
+
+    if (
+        count >= 2
+    ) {
+
+        removeButton.style.display =
+            "block";
+
+    } else {
+
+        removeButton.style.display =
+            "none";
+    }
+}
+
+
+/* =================================
+   ДОБАВИТЬ КУБ
+================================= */
+
+addButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            cubes.length >= MAX_CUBES
+        ) {
+            return;
+        }
+
+
+        const cube =
+            createCube();
+
+
+        updateLayout();
+
+        updateButtons();
+
+
+        requestAnimationFrame(
+            () => {
+
+                resizeCube(cube);
+
+                animateCube(cube);
+
+            }
+        );
+    }
+);
+
+
+/* =================================
+   УБРАТЬ КУБ
+================================= */
+
+removeButton.addEventListener(
+    "click",
+    () => {
+
+        if (
+            cubes.length <= 1
+        ) {
+            return;
+        }
+
+
+        const removed =
+            cubes.pop();
+
+
+        if (
+            removed.animation
+        ) {
+
+            cancelAnimationFrame(
+                removed.animation
+            );
+        }
+
+
+        removed.element.remove();
+
+
+        updateLayout();
+
+        updateButtons();
+    }
+);
+
+
+/* =================================
+   ЗАНОВО
+================================= */
+
+restartButton.addEventListener(
+    "click",
+    () => {
+
+        cubes.forEach(
+            cube => {
+
+                // Полностью новые
+                // случайные цвета
+                cube.colors =
+                    generateColors();
+            }
+        );
+
+
+        cubes.forEach(
+            cube => {
+
+                animateCube(cube);
+
+            }
+        );
+    }
+);
+
+
+/* =================================
+   RESIZE
+================================= */
+
+window.addEventListener(
+    "resize",
+    () => {
+
+        updateLayout();
+
+    }
+);
+
+
+/* =================================
+   ЗАПУСК
+================================= */
+
+// В начале только 1 куб
+createCube();
+
+updateLayout();
+
+updateButtons();
+
+
+const firstCube =
+    cubes[0];
+
+
+requestAnimationFrame(
+    () => {
+
+        resizeCube(firstCube);
+
+        animateCube(firstCube);
+
+    }
+);
+
+</script>
+
+</body>
+</html>
