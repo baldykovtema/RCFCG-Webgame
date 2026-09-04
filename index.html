@@ -1,55 +1,309 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Кубы</title>
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+>
+
+<title>RCFCG</title>
+
+
+<!-- =====================================================
+     SUPABASE
+===================================================== -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 
 <style>
+
+/* =====================================================
+   ОСНОВА
+===================================================== */
 
 * {
     box-sizing: border-box;
 }
 
+
 html,
 body {
+
     margin: 0;
+
     width: 100%;
     height: 100%;
+
     overflow: hidden;
+
     background: #111;
+
     font-family: Arial, sans-serif;
 }
 
+
+/* =====================================================
+   АВТОРИЗАЦИЯ
+===================================================== */
+
+#authScreen {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: #111;
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 1000;
+}
+
+
+#authBox {
+
+    width: 360px;
+
+    max-width: 90vw;
+
+    padding: 30px;
+
+    border-radius: 14px;
+
+    border: 1px solid rgba(255,255,255,0.18);
+
+    background: rgba(255,255,255,0.08);
+
+    backdrop-filter: blur(12px);
+
+    -webkit-backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 15px 50px rgba(0,0,0,0.5);
+
+    text-align: center;
+}
+
+
+#authTitle {
+
+    margin: 0 0 28px 0;
+
+    color: white;
+
+    font-size: 30px;
+
+    font-weight: bold;
+}
+
+
+.authInput {
+
+    width: 100%;
+
+    height: 44px;
+
+    margin-bottom: 12px;
+
+    padding: 0 14px;
+
+    border-radius: 8px;
+
+    border: 1px solid rgba(255,255,255,0.15);
+
+    outline: none;
+
+    background: rgba(0,0,0,0.35);
+
+    color: white;
+
+    font-size: 16px;
+}
+
+
+.authInput::placeholder {
+
+    color: rgba(255,255,255,0.55);
+}
+
+
+.authInput:focus {
+
+    border-color:
+        rgba(255,255,255,0.4);
+}
+
+
+#loginButton,
+#registerButton {
+
+    width: 100%;
+
+    height: 44px;
+
+    border: 1px solid
+        rgba(255,255,255,0.18);
+
+    border-radius: 8px;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        transform 0.15s ease;
+}
+
+
+#loginButton {
+
+    background:
+        rgba(36,107,206,0.55);
+
+    margin-top: 8px;
+}
+
+
+#loginButton:hover {
+
+    background:
+        rgba(36,107,206,0.75);
+}
+
+
+#registerButton {
+
+    background:
+        rgba(123,63,198,0.45);
+
+    margin-top: 10px;
+}
+
+
+#registerButton:hover {
+
+    background:
+        rgba(123,63,198,0.65);
+}
+
+
+#loginButton:active,
+#registerButton:active {
+
+    transform: scale(0.98);
+}
+
+
+#authMessage {
+
+    min-height: 22px;
+
+    margin-top: 15px;
+
+    color: #ff7777;
+
+    font-size: 14px;
+
+    line-height: 1.4;
+}
+
+
+#backToLogin {
+
+    display: none;
+
+    width: 100%;
+
+    margin-top: 10px;
+
+    padding: 11px;
+
+    border: 1px solid
+        rgba(255,255,255,0.15);
+
+    border-radius: 8px;
+
+    color: white;
+
+    background:
+        rgba(255,255,255,0.08);
+
+    cursor: pointer;
+}
+
+
+#backToLogin:hover {
+
+    background:
+        rgba(255,255,255,0.14);
+}
+
+
+/* =====================================================
+   ИГРА
+===================================================== */
+
+#game {
+
+    display: none;
+
+    width: 100%;
+
+    height: 100%;
+}
+
+
 #gameArea {
+
     position: absolute;
 
     left: 50%;
+
     top: 50%;
 
-    transform: translate(-50%, -50%);
+    transform:
+        translate(-50%, -50%);
 
     width: 92vw;
+
     height: 88vh;
 
     display: flex;
 
     justify-content: center;
+
     align-items: center;
 }
 
+
 #cubes {
+
     display: grid;
 
     justify-content: center;
+
     align-content: center;
 
     gap: 10px;
 }
 
+
 .cube {
+
     position: relative;
 
     width: 100%;
@@ -61,10 +315,13 @@ body {
     overflow: hidden;
 }
 
+
 canvas {
+
     display: block;
 
     width: 100%;
+
     height: 100%;
 }
 
@@ -78,19 +335,22 @@ canvas {
     position: absolute;
 
     left: 50%;
+
     top: 50%;
 
-    transform: translate(-50%, -50%);
+    transform:
+        translate(-50%, -50%);
 
     color: white;
 
-    font-size: clamp(18px, 4vw, 42px);
+    font-size:
+        clamp(18px, 4vw, 42px);
 
     font-weight: bold;
 
     text-shadow:
-        0 2px 4px rgba(0, 0, 0, 0.9),
-        0 0 8px rgba(0, 0, 0, 0.9);
+        0 2px 4px rgba(0,0,0,0.9),
+        0 0 8px rgba(0,0,0,0.9);
 
     pointer-events: none;
 
@@ -101,7 +361,7 @@ canvas {
 
 
 /* =====================================================
-   КНОПКИ
+   ИГРОВЫЕ КНОПКИ
 ===================================================== */
 
 #controls {
@@ -109,6 +369,7 @@ canvas {
     position: fixed;
 
     left: 20px;
+
     bottom: 20px;
 
     display: flex;
@@ -120,10 +381,6 @@ canvas {
     z-index: 100;
 }
 
-
-/* =====================================================
-   БЫСТРЫЙ РЕЖИМ
-===================================================== */
 
 #fastMode {
 
@@ -146,9 +403,11 @@ canvas {
     margin-bottom: 2px;
 }
 
+
 #fastMode input {
 
     width: 18px;
+
     height: 18px;
 
     margin: 0;
@@ -157,13 +416,10 @@ canvas {
 }
 
 
-/* =====================================================
-   КНОПКИ
-===================================================== */
-
 button {
 
-    border: none;
+    border: 1px solid
+        rgba(255,255,255,0.18);
 
     border-radius: 8px;
 
@@ -175,15 +431,34 @@ button {
 
     color: white;
 
-    background: #333;
+    background:
+        rgba(255,255,255,0.10);
+
+    backdrop-filter: blur(8px);
+
+    -webkit-backdrop-filter: blur(8px);
 
     cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.15s ease;
 }
+
 
 button:hover {
 
-    filter: brightness(1.2);
+    border-color:
+        rgba(255,255,255,0.28);
 }
+
+
+button:active {
+
+    transform: scale(0.98);
+}
+
 
 button:disabled {
 
@@ -192,87 +467,526 @@ button:disabled {
     cursor: default;
 }
 
+
 #addCube {
 
-    background: #246bce;
+    background:
+        rgba(36,107,206,0.35);
 }
+
+
+#addCube:hover {
+
+    background:
+        rgba(36,107,206,0.48);
+}
+
 
 #removeCube {
 
-    background: #b52b2b;
+    background:
+        rgba(181,43,43,0.35);
 }
+
+
+#removeCube:hover {
+
+    background:
+        rgba(181,43,43,0.48);
+}
+
 
 #restart {
 
-    background: #444;
+    background:
+        rgba(68,68,68,0.35);
 }
+
+
+#restart:hover {
+
+    background:
+        rgba(68,68,68,0.48);
+}
+
 
 #percentageButton {
 
-    background: #7b3fc6;
+    background:
+        rgba(123,63,198,0.35);
 
     display: none;
 }
 
+
+#percentageButton:hover {
+
+    background:
+        rgba(123,63,198,0.48);
+}
+
+
+/* =====================================================
+   ТАБЛИЦА ЛИДЕРОВ
+===================================================== */
+
+#leaderboardButton {
+
+    background:
+        rgba(46,139,87,0.35);
+}
+
+
+#leaderboardButton:hover {
+
+    background:
+        rgba(46,139,87,0.48);
+}
+
+
+#leaderboardScreen {
+
+    position: fixed;
+
+    inset: 0;
+
+    background: #111;
+
+    display: none;
+
+    flex-direction: column;
+
+    justify-content: center;
+
+    align-items: center;
+
+    z-index: 900;
+
+    padding: 20px;
+}
+
+
+#leaderboardTitle {
+
+    color: white;
+
+    font-size:
+        clamp(24px, 4vw, 40px);
+
+    font-weight: bold;
+
+    margin-bottom: 40px;
+}
+
+
+#podium {
+
+    display: flex;
+
+    gap: 40px;
+
+    justify-content: center;
+
+    align-items: flex-start;
+
+    flex-wrap: wrap;
+}
+
+
+.lbSlot {
+
+    display: flex;
+
+    flex-direction: column;
+
+    align-items: center;
+
+    width: min(26vw, 240px);
+
+    min-width: 150px;
+}
+
+
+.lbRank {
+
+    font-size:
+        clamp(28px, 5vw, 52px);
+
+    font-weight: bold;
+
+    margin-bottom: 12px;
+
+    text-shadow:
+        0 2px 6px rgba(0,0,0,0.8);
+}
+
+
+.lbCubeWrap {
+
+    position: relative;
+
+    width: 100%;
+
+    aspect-ratio: 1 / 1;
+
+    background: #000;
+
+    overflow: hidden;
+}
+
+
+.lbCubeWrap canvas {
+
+    display: block;
+
+    width: 100%;
+
+    height: 100%;
+}
+
+
+.lbPercentage {
+
+    position: absolute;
+
+    left: 50%;
+
+    top: 50%;
+
+    transform:
+        translate(-50%, -50%);
+
+    font-size:
+        clamp(18px, 4vw, 42px);
+
+    font-weight: bold;
+
+    text-shadow:
+        0 2px 4px rgba(0,0,0,0.9),
+        0 0 8px rgba(0,0,0,0.9);
+
+    pointer-events: none;
+}
+
+
+.lbName {
+
+    margin-top: 12px;
+
+    color: white;
+
+    font-size:
+        clamp(14px, 2vw, 20px);
+
+    font-weight: bold;
+
+    max-width: 100%;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    white-space: nowrap;
+}
+
+
+#leaderboardMessage {
+
+    min-height: 22px;
+
+    margin-top: 25px;
+
+    color: rgba(255,255,255,0.6);
+
+    font-size: 15px;
+}
+
+
+#leaderboardBack {
+
+    margin-top: 10px;
+
+    background:
+        rgba(68,68,68,0.35);
+}
+
+
+#leaderboardBack:hover {
+
+    background:
+        rgba(68,68,68,0.48);
+}
+
+
+/* =====================================================
+   ВЫХОД
+===================================================== */
+
+#logoutButton {
+
+    position: fixed;
+
+    top: 15px;
+
+    right: 15px;
+
+    z-index: 200;
+
+    padding: 9px 14px;
+
+    font-size: 14px;
+
+    background:
+        rgba(181,43,43,0.35);
+}
+
+
+#logoutButton:hover {
+
+    background:
+        rgba(181,43,43,0.55);
+}
+
+
 </style>
+
 </head>
 
 
 <body>
 
 
-<div id="gameArea">
+<!-- =====================================================
+     АВТОРИЗАЦИЯ
+===================================================== -->
 
-    <div id="cubes"></div>
+<div id="authScreen">
+
+    <div id="authBox">
+
+        <div id="authTitle">
+            RCFCG
+        </div>
+
+
+        <input
+            id="usernameInput"
+            class="authInput"
+            type="text"
+            placeholder="Логин"
+            autocomplete="username"
+            maxlength="30"
+        >
+
+
+        <input
+            id="passwordInput"
+            class="authInput"
+            type="password"
+            placeholder="Пароль"
+            autocomplete="current-password"
+            maxlength="72"
+        >
+
+
+        <button id="loginButton">
+            Войти
+        </button>
+
+
+        <div
+            id="registerText"
+            style="
+                color:white;
+                margin-top:18px;
+                margin-bottom:2px;
+            "
+        >
+            Нет аккаунта?
+        </div>
+
+
+        <button id="registerButton">
+            Зарегистрироваться
+        </button>
+
+
+        <button id="backToLogin">
+            Назад
+        </button>
+
+
+        <div id="authMessage"></div>
+
+    </div>
 
 </div>
 
 
-<div id="controls">
+<!-- =====================================================
+     ИГРА
+===================================================== -->
+
+<div id="game">
 
 
-    <!-- БЫСТРЫЙ РЕЖИМ -->
+    <div id="gameArea">
 
-    <label id="fastMode">
+        <div id="cubes"></div>
 
-        <input
-            type="checkbox"
-            id="fastModeCheckbox"
+    </div>
+
+
+    <button id="logoutButton">
+        Выйти
+    </button>
+
+
+    <div id="controls">
+
+
+        <label id="fastMode">
+
+            <input
+                type="checkbox"
+                id="fastModeCheckbox"
+            >
+
+            <span>
+                Быстрый режим
+            </span>
+
+        </label>
+
+
+        <button id="addCube">
+            Добавить куб 1/21
+        </button>
+
+
+        <button
+            id="removeCube"
+            style="display:none;"
         >
-
-        <span>Быстрый режим</span>
-
-    </label>
+            Убрать куб
+        </button>
 
 
-    <!-- ДОБАВИТЬ КУБ -->
-
-    <button id="addCube">
-        Добавить куб 1/21
-    </button>
+        <button id="restart">
+            Заново
+        </button>
 
 
-    <!-- УБРАТЬ КУБ -->
-
-    <button
-        id="removeCube"
-        style="display: none;"
-    >
-        Убрать куб
-    </button>
+        <button id="percentageButton">
+            Посмотреть проценты до идеала
+        </button>
 
 
-    <!-- ЗАНОВО -->
-
-    <button id="restart">
-        Заново
-    </button>
+        <button id="leaderboardButton">
+            Таблица лидеров
+        </button>
 
 
-    <!-- ПРОЦЕНТЫ -->
+    </div>
 
-    <button id="percentageButton">
-        Посмотреть проценты до идеала
+</div>
+
+
+<!-- =====================================================
+     ТАБЛИЦА ЛИДЕРОВ
+===================================================== -->
+
+<div id="leaderboardScreen">
+
+
+    <div id="leaderboardTitle">
+        Таблица лидеров
+    </div>
+
+
+    <div id="podium">
+
+
+        <div class="lbSlot" id="slot0">
+
+            <div
+                class="lbRank"
+                style="color:#ffd700;"
+            >
+                1
+            </div>
+
+            <div class="lbCubeWrap">
+
+                <canvas></canvas>
+
+                <div class="lbPercentage"></div>
+
+            </div>
+
+            <div class="lbName">
+                —
+            </div>
+
+        </div>
+
+
+        <div class="lbSlot" id="slot1">
+
+            <div
+                class="lbRank"
+                style="color:#c0c0c0;"
+            >
+                2
+            </div>
+
+            <div class="lbCubeWrap">
+
+                <canvas></canvas>
+
+                <div class="lbPercentage"></div>
+
+            </div>
+
+            <div class="lbName">
+                —
+            </div>
+
+        </div>
+
+
+        <div class="lbSlot" id="slot2">
+
+            <div
+                class="lbRank"
+                style="color:#cd7f32;"
+            >
+                3
+            </div>
+
+            <div class="lbCubeWrap">
+
+                <canvas></canvas>
+
+                <div class="lbPercentage"></div>
+
+            </div>
+
+            <div class="lbName">
+                —
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <div id="leaderboardMessage"></div>
+
+
+    <button id="leaderboardBack">
+        Назад
     </button>
 
 
@@ -283,44 +997,742 @@ button:disabled {
 
 
 /* =====================================================
-   НАСТРОЙКИ
+   SUPABASE
 ===================================================== */
 
-const MAX_CUBES = 21;
+const SUPABASE_URL =
+    "https://htooxiwcryzjopbnitef.supabase.co";
 
-const LINE_COUNT = 80;
 
-const FILL_TIME = 3000;
+/*
+   ВСТАВЬ СЮДА СВОЙ PUBLISHABLE KEY / ANON KEY
+   ИМЕННО ОТ ЭТОГО ПРОЕКТА.
+*/
 
-const GAP = 10;
+const SUPABASE_ANON_KEY =
+    "sb_publishable_EvgpU14PTHkWQRUfr6f9RQ_lOVMrN9B";
+
+
+const supabaseClient =
+    window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
 
 
 /* =====================================================
-   ЭЛЕМЕНТЫ
+   ЭЛЕМЕНТЫ АВТОРИЗАЦИИ
 ===================================================== */
 
-const cubesContainer =
-    document.getElementById("cubes");
+const authScreen =
+    document.getElementById(
+        "authScreen"
+    );
 
-const addButton =
-    document.getElementById("addCube");
 
-const removeButton =
-    document.getElementById("removeCube");
+const game =
+    document.getElementById(
+        "game"
+    );
 
-const restartButton =
-    document.getElementById("restart");
 
-const percentageButton =
-    document.getElementById("percentageButton");
+const usernameInput =
+    document.getElementById(
+        "usernameInput"
+    );
 
-const fastModeCheckbox =
-    document.getElementById("fastModeCheckbox");
+
+const passwordInput =
+    document.getElementById(
+        "passwordInput"
+    );
+
+
+const loginButton =
+    document.getElementById(
+        "loginButton"
+    );
+
+
+const registerButton =
+    document.getElementById(
+        "registerButton"
+    );
+
+
+const backToLogin =
+    document.getElementById(
+        "backToLogin"
+    );
+
+
+const registerText =
+    document.getElementById(
+        "registerText"
+    );
+
+
+const authMessage =
+    document.getElementById(
+        "authMessage"
+    );
+
+
+const logoutButton =
+    document.getElementById(
+        "logoutButton"
+    );
+
+
+let registrationMode = false;
+
+
+/* =====================================================
+   СООБЩЕНИЯ
+===================================================== */
+
+function showAuthMessage(message) {
+
+    authMessage.textContent =
+        message;
+
+}
+
+
+/* =====================================================
+   ПРОВЕРКА ЛОГИНА
+===================================================== */
+
+function isValidUsername(username) {
+
+    return /^[a-zA-Z0-9_]{3,30}$/
+        .test(username);
+
+}
+
+
+/* =====================================================
+   ТЕХНИЧЕСКИЙ EMAIL
+===================================================== */
+
+function usernameToEmail(username) {
+
+    return (
+        username
+            .trim()
+            .toLowerCase()
+        +
+        "@rcfcg-game.com"
+    );
+
+}
+
+
+/* =====================================================
+   ПОКАЗАТЬ ИГРУ
+===================================================== */
+
+function showGame() {
+
+    authScreen.style.display =
+        "none";
+
+    game.style.display =
+        "block";
+
+    requestAnimationFrame(
+        () => {
+
+            updateLayout();
+
+        }
+    );
+
+}
+
+
+/* =====================================================
+   ПОКАЗАТЬ АВТОРИЗАЦИЮ
+===================================================== */
+
+function showAuth() {
+
+    game.style.display =
+        "none";
+
+    authScreen.style.display =
+        "flex";
+
+}
+
+
+/* =====================================================
+   РЕЖИМ РЕГИСТРАЦИИ
+===================================================== */
+
+function enterRegistrationMode() {
+
+    registrationMode =
+        true;
+
+
+    document.getElementById(
+        "authTitle"
+    ).textContent =
+        "Регистрация";
+
+
+    loginButton.style.display =
+        "none";
+
+
+    registerText.style.display =
+        "none";
+
+
+    registerButton.textContent =
+        "Создать аккаунт";
+
+
+    backToLogin.style.display =
+        "block";
+
+
+    passwordInput.value =
+        "";
+
+
+    showAuthMessage("");
+
+}
+
+
+/* =====================================================
+   НАЗАД КО ВХОДУ
+===================================================== */
+
+backToLogin.addEventListener(
+    "click",
+    () => {
+
+        registrationMode =
+            false;
+
+
+        document.getElementById(
+            "authTitle"
+        ).textContent =
+            "RCFCG";
+
+
+        loginButton.style.display =
+            "block";
+
+
+        registerText.style.display =
+            "block";
+
+
+        registerButton.textContent =
+            "Зарегистрироваться";
+
+
+        backToLogin.style.display =
+            "none";
+
+
+        showAuthMessage("");
+
+    }
+);
+
+
+/* =====================================================
+   НАЖАТИЕ РЕГИСТРАЦИИ
+===================================================== */
+
+registerButton.addEventListener(
+    "click",
+    async () => {
+
+        if (!registrationMode) {
+
+            enterRegistrationMode();
+
+            return;
+
+        }
+
+
+        const username =
+            usernameInput.value
+                .trim()
+                .toLowerCase();
+
+
+        const password =
+            passwordInput.value;
+
+
+        if (
+            !isValidUsername(
+                username
+            )
+        ) {
+
+            showAuthMessage(
+                "Логин: 3–30 символов. Используй только латинские буквы, цифры и _."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            password.length < 6
+        ) {
+
+            showAuthMessage(
+                "Пароль должен содержать минимум 6 символов."
+            );
+
+            return;
+
+        }
+
+
+        registerButton.disabled =
+            true;
+
+
+        showAuthMessage(
+            "Создание аккаунта..."
+        );
+
+
+        const email =
+            usernameToEmail(
+                username
+            );
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth.signUp({
+
+                email:
+                    email,
+
+                password:
+                    password,
+
+                options: {
+
+                    data: {
+
+                        username:
+                            username
+
+                    }
+
+                }
+
+            });
+
+
+        registerButton.disabled =
+            false;
+
+
+        if (error) {
+
+            console.error(error);
+
+
+            if (
+                error.message
+                    .toLowerCase()
+                    .includes(
+                        "already registered"
+                    )
+            ) {
+
+                showAuthMessage(
+                    "Такой логин уже занят."
+                );
+
+            } else {
+
+                showAuthMessage(
+                    "Ошибка: " +
+                    error.message
+                );
+
+            }
+
+
+            return;
+
+        }
+
+
+        /*
+           Если Confirm email выключен,
+           session будет создана сразу.
+        */
+
+        if (
+            data.session
+        ) {
+
+            showAuthMessage("");
+
+            showGame();
+
+            return;
+
+        }
+
+
+        /*
+           Если подтверждение почему-то включено.
+        */
+
+        showAuthMessage(
+            "Аккаунт создан. Проверь настройки Confirm email в Supabase."
+        );
+
+
+        registrationMode =
+            false;
+
+
+        document.getElementById(
+            "authTitle"
+        ).textContent =
+            "RCFCG";
+
+
+        loginButton.style.display =
+            "block";
+
+
+        registerText.style.display =
+            "block";
+
+
+        registerButton.textContent =
+            "Зарегистрироваться";
+
+
+        backToLogin.style.display =
+            "none";
+
+    }
+);
+
+
+/* =====================================================
+   ВХОД
+===================================================== */
+
+loginButton.addEventListener(
+    "click",
+    async () => {
+
+        const username =
+            usernameInput.value
+                .trim()
+                .toLowerCase();
+
+
+        const password =
+            passwordInput.value;
+
+
+        if (!username) {
+
+            showAuthMessage(
+                "Введите логин."
+            );
+
+            return;
+
+        }
+
+
+        if (!password) {
+
+            showAuthMessage(
+                "Введите пароль."
+            );
+
+            return;
+
+        }
+
+
+        if (
+            !isValidUsername(
+                username
+            )
+        ) {
+
+            showAuthMessage(
+                "Неверный логин."
+            );
+
+            return;
+
+        }
+
+
+        loginButton.disabled =
+            true;
+
+
+        showAuthMessage(
+            "Выполняется вход..."
+        );
+
+
+        const email =
+            usernameToEmail(
+                username
+            );
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient.auth
+                .signInWithPassword({
+
+                    email:
+                        email,
+
+                    password:
+                        password
+
+                });
+
+
+        loginButton.disabled =
+            false;
+
+
+        if (error) {
+
+            console.error(error);
+
+
+            showAuthMessage(
+                "Неверный логин или пароль."
+            );
+
+            return;
+
+        }
+
+
+        showAuthMessage("");
+
+        showGame();
+
+    }
+);
+
+
+/* =====================================================
+   ENTER
+===================================================== */
+
+usernameInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            passwordInput.focus();
+
+        }
+
+    }
+);
+
+
+passwordInput.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Enter"
+        ) {
+
+            if (
+                registrationMode
+            ) {
+
+                registerButton.click();
+
+            } else {
+
+                loginButton.click();
+
+            }
+
+        }
+
+    }
+);
+
+
+/* =====================================================
+   ВЫХОД
+===================================================== */
+
+logoutButton.addEventListener(
+    "click",
+    async () => {
+
+        await supabaseClient.auth.signOut();
+
+
+        showAuth();
+
+
+        usernameInput.value =
+            "";
+
+
+        passwordInput.value =
+            "";
+
+
+        registrationMode =
+            false;
+
+
+        document.getElementById(
+            "authTitle"
+        ).textContent =
+            "RCFCG";
+
+
+        loginButton.style.display =
+            "block";
+
+
+        registerText.style.display =
+            "block";
+
+
+        registerButton.textContent =
+            "Зарегистрироваться";
+
+
+        backToLogin.style.display =
+            "none";
+
+
+        showAuthMessage("");
+
+    }
+);
+
+
+/* =====================================================
+   ПРОВЕРКА СЕССИИ
+===================================================== */
+
+async function checkSession() {
+
+    const {
+        data
+    } =
+        await supabaseClient.auth
+            .getSession();
+
+
+    if (
+        data.session
+    ) {
+
+        showGame();
+
+    } else {
+
+        showAuth();
+
+    }
+
+}
+
+
+checkSession();
 
 
 /* =====================================================
    КУБЫ
 ===================================================== */
+
+const MAX_CUBES =
+    21;
+
+
+const LINE_COUNT =
+    80;
+
+
+const FILL_TIME =
+    3000;
+
+
+const GAP =
+    10;
+
+
+const cubesContainer =
+    document.getElementById(
+        "cubes"
+    );
+
+
+const addButton =
+    document.getElementById(
+        "addCube"
+    );
+
+
+const removeButton =
+    document.getElementById(
+        "removeCube"
+    );
+
+
+const restartButton =
+    document.getElementById(
+        "restart"
+    );
+
+
+const percentageButton =
+    document.getElementById(
+        "percentageButton"
+    );
+
+
+const fastModeCheckbox =
+    document.getElementById(
+        "fastModeCheckbox"
+    );
+
 
 let cubes = [];
 
@@ -336,9 +1748,11 @@ function randomColor() {
             Math.random() * 360
         );
 
+
     const saturation =
         75 +
         Math.random() * 25;
+
 
     const lightness =
         50 +
@@ -354,6 +1768,7 @@ function randomColor() {
             hue
 
     };
+
 }
 
 
@@ -380,6 +1795,7 @@ function generateColors() {
 
 
     return colors;
+
 }
 
 
@@ -390,7 +1806,9 @@ function generateColors() {
 function createCube() {
 
     const cube =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     cube.className =
@@ -398,18 +1816,20 @@ function createCube() {
 
 
     const canvas =
-        document.createElement("canvas");
+        document.createElement(
+            "canvas"
+        );
 
 
-    cube.appendChild(canvas);
+    cube.appendChild(
+        canvas
+    );
 
-
-    /*
-       ПРОЦЕНТ
-    */
 
     const percentage =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
 
 
     percentage.className =
@@ -456,13 +1876,18 @@ function createCube() {
     };
 
 
-    cubes.push(data);
+    cubes.push(
+        data
+    );
 
 
-    resizeCube(data);
+    resizeCube(
+        data
+    );
 
 
     return data;
+
 }
 
 
@@ -473,7 +1898,8 @@ function createCube() {
 function resizeCube(data) {
 
     const rect =
-        data.element.getBoundingClientRect();
+        data.element
+            .getBoundingClientRect();
 
 
     if (
@@ -482,6 +1908,7 @@ function resizeCube(data) {
     ) {
 
         return;
+
     }
 
 
@@ -506,6 +1933,7 @@ function resizeCube(data) {
         data,
         data.progress
     );
+
 }
 
 
@@ -523,16 +1951,21 @@ function drawCube(
 
 
     const ctx =
-        canvas.getContext("2d");
+        canvas.getContext(
+            "2d"
+        );
 
 
     const size =
         canvas.width;
 
 
-    if (size <= 0) {
+    if (
+        size <= 0
+    ) {
 
         return;
+
     }
 
 
@@ -918,30 +2351,24 @@ function drawCube(
 
 function animateCube(data) {
 
-
-    /*
-       Если включён быстрый режим
-    */
-
     if (
         fastModeCheckbox.checked
     ) {
 
-        if (data.animation) {
+        if (
+            data.animation
+        ) {
 
             cancelAnimationFrame(
                 data.animation
             );
 
+
             data.animation =
                 null;
+
         }
 
-
-        /*
-           Кадр 1:
-           пустой куб
-        */
 
         data.progress =
             0;
@@ -952,11 +2379,6 @@ function animateCube(data) {
             0
         );
 
-
-        /*
-           Кадр 2:
-           полный куб
-        */
 
         requestAnimationFrame(
             () => {
@@ -978,18 +2400,18 @@ function animateCube(data) {
 
 
         return;
+
     }
 
 
-    /*
-       ОБЫЧНЫЙ РЕЖИМ
-    */
-
-    if (data.animation) {
+    if (
+        data.animation
+    ) {
 
         cancelAnimationFrame(
             data.animation
         );
+
     }
 
 
@@ -1047,6 +2469,7 @@ function animateCube(data) {
         requestAnimationFrame(
             frame
         );
+
 }
 
 
@@ -1063,7 +2486,9 @@ function checkAllCubesFilled() {
         percentageButton.style.display =
             "none";
 
+
         return;
+
     }
 
 
@@ -1074,7 +2499,9 @@ function checkAllCubesFilled() {
         );
 
 
-    if (allFilled) {
+    if (
+        allFilled
+    ) {
 
         percentageButton.style.display =
             "block";
@@ -1085,6 +2512,7 @@ function checkAllCubesFilled() {
             "none";
 
     }
+
 }
 
 
@@ -1132,11 +2560,15 @@ function getDominantColor(data) {
                         group;
 
                     break;
+
                 }
+
             }
 
 
-            if (found) {
+            if (
+                found
+            ) {
 
                 found.count++;
 
@@ -1162,18 +2594,19 @@ function getDominantColor(data) {
 
 
     groups.sort(
-        (a, b) =>
+        (a,b) =>
             b.count -
             a.count
     );
 
 
     return groups[0];
+
 }
 
 
 /* =====================================================
-   ПОКАЗАТЬ ПРОЦЕНТЫ
+   ПРОЦЕНТЫ
 ===================================================== */
 
 function showPercentages() {
@@ -1185,10 +2618,16 @@ function showPercentages() {
         );
 
 
-    if (!allFilled) {
+    if (
+        !allFilled
+    ) {
 
         return;
+
     }
+
+
+    let best = null;
 
 
     cubes.forEach(
@@ -1223,8 +2662,44 @@ function showPercentages() {
             cube.showPercentage =
                 true;
 
+
+            if (
+                !best ||
+                percentage >
+                    best.percentage
+            ) {
+
+                best = {
+
+                    percentage:
+                        percentage,
+
+                    dominantCss:
+                        dominant.css,
+
+                    colors:
+                        cube.colors
+
+                };
+
+            }
+
         }
     );
+
+
+    if (
+        best
+    ) {
+
+        saveToLeaderboard(
+            best.percentage,
+            best.dominantCss,
+            best.colors
+        );
+
+    }
+
 }
 
 
@@ -1243,6 +2718,7 @@ function updateLayout() {
     ) {
 
         return;
+
     }
 
 
@@ -1325,6 +2801,7 @@ function updateLayout() {
 
             bestRows =
                 rows;
+
         }
 
     }
@@ -1340,8 +2817,11 @@ function updateLayout() {
 
     cubes.forEach(
         cube =>
-            resizeCube(cube)
+            resizeCube(
+                cube
+            )
     );
+
 }
 
 
@@ -1356,8 +2836,7 @@ function updateButtons() {
 
 
     if (
-        count <
-        MAX_CUBES
+        count < MAX_CUBES
     ) {
 
         addButton.textContent =
@@ -1375,6 +2854,7 @@ function updateButtons() {
 
         addButton.disabled =
             true;
+
     }
 
 
@@ -1389,12 +2869,14 @@ function updateButtons() {
 
         removeButton.style.display =
             "none";
+
     }
+
 }
 
 
 /* =====================================================
-   ДОБАВЛЕНИЕ КУБА
+   ДОБАВИТЬ КУБ
 ===================================================== */
 
 addButton.addEventListener(
@@ -1407,12 +2889,9 @@ addButton.addEventListener(
         ) {
 
             return;
+
         }
 
-
-        /*
-           Проценты скрываем
-        */
 
         percentageButton.style.display =
             "none";
@@ -1447,7 +2926,7 @@ addButton.addEventListener(
 
 
 /* =====================================================
-   УДАЛЕНИЕ КУБА
+   УБРАТЬ КУБ
 ===================================================== */
 
 removeButton.addEventListener(
@@ -1459,6 +2938,7 @@ removeButton.addEventListener(
         ) {
 
             return;
+
         }
 
 
@@ -1477,6 +2957,7 @@ removeButton.addEventListener(
             cancelAnimationFrame(
                 removed.animation
             );
+
         }
 
 
@@ -1499,10 +2980,6 @@ restartButton.addEventListener(
     "click",
     () => {
 
-        /*
-           Скрываем проценты
-        */
-
         percentageButton.style.display =
             "none";
 
@@ -1524,10 +3001,6 @@ restartButton.addEventListener(
             }
         );
 
-
-        /*
-           Перезапускаем
-        */
 
         cubes.forEach(
             cube =>
@@ -1562,18 +3035,9 @@ fastModeCheckbox.addEventListener(
     "change",
     () => {
 
-        /*
-           Проценты скрываем
-        */
-
         percentageButton.style.display =
             "none";
 
-
-        /*
-           Перезапускаем
-           все кубы в новом режиме
-        */
 
         cubes.forEach(
             cube => {
@@ -1586,8 +3050,10 @@ fastModeCheckbox.addEventListener(
                         cube.animation
                     );
 
+
                     cube.animation =
                         null;
+
                 }
 
 
@@ -1619,6 +3085,416 @@ window.addEventListener(
     () => {
 
         updateLayout();
+
+    }
+);
+
+
+/* =====================================================
+   ТАБЛИЦА ЛИДЕРОВ
+===================================================== */
+
+const leaderboardButton =
+    document.getElementById(
+        "leaderboardButton"
+    );
+
+
+const leaderboardScreen =
+    document.getElementById(
+        "leaderboardScreen"
+    );
+
+
+const leaderboardBack =
+    document.getElementById(
+        "leaderboardBack"
+    );
+
+
+const leaderboardMessage =
+    document.getElementById(
+        "leaderboardMessage"
+    );
+
+
+const leaderboardSlots = [
+
+    document.getElementById(
+        "slot0"
+    ),
+
+    document.getElementById(
+        "slot1"
+    ),
+
+    document.getElementById(
+        "slot2"
+    )
+
+];
+
+
+/* =====================================================
+   СОХРАНЕНИЕ РЕЗУЛЬТАТА
+===================================================== */
+
+async function saveToLeaderboard(
+    percentage,
+    dominantCss,
+    colors
+) {
+
+    try {
+
+        const {
+            data: userData
+        } =
+            await supabaseClient.auth
+                .getUser();
+
+
+        const user =
+            userData.user;
+
+
+        if (
+            !user
+        ) {
+
+            return;
+
+        }
+
+
+        const username =
+            (
+                user.user_metadata &&
+                user.user_metadata
+                    .username
+            )
+                ?
+                    user.user_metadata
+                        .username
+                :
+                    user.email
+                        .split("@")[0];
+
+
+        const {
+            data: existing
+        } =
+            await supabaseClient
+                .from("leaderboard")
+                .select(
+                    "best_percentage"
+                )
+                .eq(
+                    "user_id",
+                    user.id
+                )
+                .maybeSingle();
+
+
+        if (
+            existing &&
+            existing.best_percentage >=
+                percentage
+        ) {
+
+            return;
+
+        }
+
+
+        const {
+            error
+        } =
+            await supabaseClient
+                .from("leaderboard")
+                .upsert({
+
+                    user_id:
+                        user.id,
+
+                    username:
+                        username,
+
+                    best_percentage:
+                        percentage,
+
+                    dominant_color:
+                        dominantCss,
+
+                    colors:
+                        colors.map(
+                            color =>
+                                color.css
+                        )
+
+                });
+
+
+        if (
+            error
+        ) {
+
+            console.error(
+                "Leaderboard save:",
+                error
+            );
+
+        }
+
+    } catch (e) {
+
+        console.error(
+            "Leaderboard save:",
+            e
+        );
+
+    }
+
+}
+
+
+/* =====================================================
+   ОТРИСОВКА МЕСТА
+===================================================== */
+
+function renderLeaderboardSlot(
+    slot,
+    row
+) {
+
+    const canvas =
+        slot.querySelector(
+            "canvas"
+        );
+
+
+    const percentageEl =
+        slot.querySelector(
+            ".lbPercentage"
+        );
+
+
+    const nameEl =
+        slot.querySelector(
+            ".lbName"
+        );
+
+
+    const wrap =
+        slot.querySelector(
+            ".lbCubeWrap"
+        );
+
+
+    const size =
+        Math.floor(
+            wrap
+                .getBoundingClientRect()
+                .width
+        );
+
+
+    canvas.width =
+        size > 0 ? size : 200;
+
+
+    canvas.height =
+        canvas.width;
+
+
+    const ctx =
+        canvas.getContext(
+            "2d"
+        );
+
+
+    ctx.clearRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+    );
+
+
+    if (
+        !row
+    ) {
+
+        percentageEl.textContent =
+            "";
+
+
+        nameEl.textContent =
+            "—";
+
+
+        return;
+
+    }
+
+
+    const colors =
+        (row.colors || []).map(
+            css => ({
+                css: css
+            })
+        );
+
+
+    if (
+        colors.length ===
+            LINE_COUNT
+    ) {
+
+        drawCube(
+            {
+                canvas:
+                    canvas,
+
+                colors:
+                    colors
+            },
+            1
+        );
+
+    }
+
+
+    percentageEl.textContent =
+        row.best_percentage + "%";
+
+
+    percentageEl.style.color =
+        row.dominant_color ||
+        "white";
+
+
+    nameEl.textContent =
+        row.username;
+
+}
+
+
+/* =====================================================
+   ОТКРЫТЬ ТАБЛИЦУ
+===================================================== */
+
+leaderboardButton.addEventListener(
+    "click",
+    async () => {
+
+        game.style.display =
+            "none";
+
+
+        leaderboardScreen.style.display =
+            "flex";
+
+
+        leaderboardMessage.textContent =
+            "Загрузка...";
+
+
+        const {
+            data,
+            error
+        } =
+            await supabaseClient
+                .from("leaderboard")
+                .select(
+                    "username, best_percentage, dominant_color, colors"
+                )
+                .order(
+                    "best_percentage",
+                    {
+                        ascending:
+                            false
+                    }
+                )
+                .limit(3);
+
+
+        if (
+            error
+        ) {
+
+            console.error(
+                "Leaderboard load:",
+                error
+            );
+
+
+            leaderboardMessage.textContent =
+                "Не удалось загрузить таблицу лидеров.";
+
+
+            return;
+
+        }
+
+
+        leaderboardMessage.textContent =
+            data.length
+                ? ""
+                : "Пока нет результатов.";
+
+
+        requestAnimationFrame(
+            () => {
+
+                leaderboardSlots
+                    .forEach(
+                        (
+                            slot,
+                            index
+                        ) => {
+
+                            renderLeaderboardSlot(
+                                slot,
+                                data[
+                                    index
+                                ] ||
+                                null
+                            );
+
+                        }
+                    );
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   НАЗАД К ИГРЕ
+===================================================== */
+
+leaderboardBack.addEventListener(
+    "click",
+    () => {
+
+        leaderboardScreen.style.display =
+            "none";
+
+
+        game.style.display =
+            "block";
+
+
+        requestAnimationFrame(
+            () => {
+
+                updateLayout();
+
+            }
+        );
 
     }
 );
@@ -1658,4 +3534,3 @@ requestAnimationFrame(
 
 </body>
 </html>
-```
