@@ -4,9 +4,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Кубы</title>
 
 <style>
+
 * {
     box-sizing: border-box;
 }
@@ -23,22 +25,27 @@ body {
 
 #gameArea {
     position: absolute;
+
     left: 50%;
     top: 50%;
+
     transform: translate(-50%, -50%);
 
     width: 92vw;
     height: 88vh;
 
     display: flex;
+
     justify-content: center;
     align-items: center;
 }
 
 #cubes {
     display: grid;
+
     justify-content: center;
     align-content: center;
+
     gap: 10px;
 }
 
@@ -46,9 +53,11 @@ body {
     position: relative;
 
     width: 100%;
+
     aspect-ratio: 1 / 1;
 
     background: #000;
+
     overflow: hidden;
 }
 
@@ -59,9 +68,13 @@ canvas {
     height: 100%;
 }
 
-/* Процент внутри куба */
+
+/* =====================================================
+   ПРОЦЕНТ
+===================================================== */
 
 .percentage {
+
     position: absolute;
 
     left: 50%;
@@ -72,6 +85,7 @@ canvas {
     color: white;
 
     font-size: clamp(18px, 4vw, 42px);
+
     font-weight: bold;
 
     text-shadow:
@@ -85,15 +99,20 @@ canvas {
     display: none;
 }
 
-/* Кнопки */
+
+/* =====================================================
+   КНОПКИ
+===================================================== */
 
 #controls {
+
     position: fixed;
 
     left: 20px;
     bottom: 20px;
 
     display: flex;
+
     flex-direction: column;
 
     gap: 8px;
@@ -101,13 +120,57 @@ canvas {
     z-index: 100;
 }
 
+
+/* =====================================================
+   БЫСТРЫЙ РЕЖИМ
+===================================================== */
+
+#fastMode {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    color: white;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    user-select: none;
+
+    margin-bottom: 2px;
+}
+
+#fastMode input {
+
+    width: 18px;
+    height: 18px;
+
+    margin: 0;
+
+    cursor: pointer;
+}
+
+
+/* =====================================================
+   КНОПКИ
+===================================================== */
+
 button {
+
     border: none;
+
     border-radius: 8px;
 
     padding: 12px 18px;
 
     font-size: 16px;
+
     font-weight: bold;
 
     color: white;
@@ -118,60 +181,110 @@ button {
 }
 
 button:hover {
+
     filter: brightness(1.2);
 }
 
 button:disabled {
+
     opacity: 0.4;
+
     cursor: default;
 }
 
 #addCube {
+
     background: #246bce;
 }
 
 #removeCube {
+
     background: #b52b2b;
 }
 
 #restart {
+
     background: #444;
 }
 
 #percentageButton {
+
     background: #7b3fc6;
+
     display: none;
 }
+
 </style>
 </head>
 
+
 <body>
 
+
 <div id="gameArea">
+
     <div id="cubes"></div>
+
 </div>
 
+
 <div id="controls">
+
+
+    <!-- БЫСТРЫЙ РЕЖИМ -->
+
+    <label id="fastMode">
+
+        <input
+            type="checkbox"
+            id="fastModeCheckbox"
+        >
+
+        <span>Быстрый режим</span>
+
+    </label>
+
+
+    <!-- ДОБАВИТЬ КУБ -->
 
     <button id="addCube">
         Добавить куб 1/21
     </button>
 
-    <button id="removeCube" style="display: none;">
+
+    <!-- УБРАТЬ КУБ -->
+
+    <button
+        id="removeCube"
+        style="display: none;"
+    >
         Убрать куб
     </button>
+
+
+    <!-- ЗАНОВО -->
 
     <button id="restart">
         Заново
     </button>
 
+
+    <!-- ПРОЦЕНТЫ -->
+
     <button id="percentageButton">
         Посмотреть проценты до идеала
     </button>
 
+
 </div>
 
+
 <script>
+
+
+/* =====================================================
+   НАСТРОЙКИ
+===================================================== */
 
 const MAX_CUBES = 21;
 
@@ -181,6 +294,10 @@ const FILL_TIME = 3000;
 
 const GAP = 10;
 
+
+/* =====================================================
+   ЭЛЕМЕНТЫ
+===================================================== */
 
 const cubesContainer =
     document.getElementById("cubes");
@@ -197,99 +314,144 @@ const restartButton =
 const percentageButton =
     document.getElementById("percentageButton");
 
+const fastModeCheckbox =
+    document.getElementById("fastModeCheckbox");
+
+
+/* =====================================================
+   КУБЫ
+===================================================== */
 
 let cubes = [];
 
 
-/* =========================================================
+/* =====================================================
    СЛУЧАЙНЫЙ ЦВЕТ
-========================================================= */
+===================================================== */
 
 function randomColor() {
 
     const hue =
-        Math.floor(Math.random() * 360);
+        Math.floor(
+            Math.random() * 360
+        );
 
     const saturation =
-        75 + Math.random() * 25;
+        75 +
+        Math.random() * 25;
 
     const lightness =
-        50 + Math.random() * 20;
+        50 +
+        Math.random() * 20;
+
 
     return {
-        css: `hsl(${hue}, ${saturation}%, ${lightness}%)`,
-        hue: hue
+
+        css:
+            `hsl(${hue}, ${saturation}%, ${lightness}%)`,
+
+        hue:
+            hue
+
     };
 }
 
 
-/* =========================================================
-   СОЗДАНИЕ ЦВЕТОВ
-========================================================= */
+/* =====================================================
+   ЦВЕТА
+===================================================== */
 
 function generateColors() {
 
     const colors = [];
 
-    for (let i = 0; i < LINE_COUNT; i++) {
 
-        colors.push(randomColor());
+    for (
+        let i = 0;
+        i < LINE_COUNT;
+        i++
+    ) {
+
+        colors.push(
+            randomColor()
+        );
 
     }
+
 
     return colors;
 }
 
 
-/* =========================================================
+/* =====================================================
    СОЗДАНИЕ КУБА
-========================================================= */
+===================================================== */
 
 function createCube() {
 
-    const cube = document.createElement("div");
+    const cube =
+        document.createElement("div");
 
-    cube.className = "cube";
+
+    cube.className =
+        "cube";
 
 
     const canvas =
         document.createElement("canvas");
 
+
     cube.appendChild(canvas);
 
 
     /*
-       Процент
+       ПРОЦЕНТ
     */
 
     const percentage =
         document.createElement("div");
 
-    percentage.className = "percentage";
 
-    percentage.textContent = "0%";
-
-    cube.appendChild(percentage);
+    percentage.className =
+        "percentage";
 
 
-    cubesContainer.appendChild(cube);
+    percentage.textContent =
+        "0%";
+
+
+    cube.appendChild(
+        percentage
+    );
+
+
+    cubesContainer.appendChild(
+        cube
+    );
 
 
     const data = {
 
-        element: cube,
+        element:
+            cube,
 
-        canvas: canvas,
+        canvas:
+            canvas,
 
-        percentage: percentage,
+        percentage:
+            percentage,
 
-        colors: generateColors(),
+        colors:
+            generateColors(),
 
-        progress: 0,
+        progress:
+            0,
 
-        animation: null,
+        animation:
+            null,
 
-        showPercentage: false
+        showPercentage:
+            false
 
     };
 
@@ -304,9 +466,9 @@ function createCube() {
 }
 
 
-/* =========================================================
+/* =====================================================
    РАЗМЕР КУБА
-========================================================= */
+===================================================== */
 
 function resizeCube(data) {
 
@@ -318,6 +480,7 @@ function resizeCube(data) {
         rect.width <= 0 ||
         rect.height <= 0
     ) {
+
         return;
     }
 
@@ -331,9 +494,12 @@ function resizeCube(data) {
         );
 
 
-    data.canvas.width = size;
+    data.canvas.width =
+        size;
 
-    data.canvas.height = size;
+
+    data.canvas.height =
+        size;
 
 
     drawCube(
@@ -343,22 +509,29 @@ function resizeCube(data) {
 }
 
 
-/* =========================================================
-   РИСОВАНИЕ КУБА
-========================================================= */
+/* =====================================================
+   РИСОВАНИЕ
+===================================================== */
 
-function drawCube(data, progress) {
+function drawCube(
+    data,
+    progress
+) {
 
-    const canvas = data.canvas;
+    const canvas =
+        data.canvas;
+
 
     const ctx =
         canvas.getContext("2d");
+
 
     const size =
         canvas.width;
 
 
     if (size <= 0) {
+
         return;
     }
 
@@ -375,27 +548,36 @@ function drawCube(data, progress) {
         size / 2;
 
 
-    /*
-       ЛЕВАЯ ЧАСТЬ
-    */
+    /* =================================================
+       ЛЕВО
+    ================================================= */
 
     ctx.save();
 
+
     ctx.beginPath();
 
-    ctx.moveTo(0, 0);
+
+    ctx.moveTo(
+        0,
+        0
+    );
+
 
     ctx.lineTo(
         center,
         center
     );
 
+
     ctx.lineTo(
         0,
         size
     );
 
+
     ctx.closePath();
+
 
     ctx.clip();
 
@@ -428,7 +610,8 @@ function drawCube(data, progress) {
 
 
         const currentX =
-            maxX * progress;
+            maxX *
+            progress;
 
 
         ctx.fillStyle =
@@ -441,36 +624,43 @@ function drawCube(data, progress) {
             currentX,
             lineHeight + 1
         );
+
     }
 
 
     ctx.restore();
 
 
-    /*
-       ПРАВАЯ ЧАСТЬ
-    */
+    /* =================================================
+       ПРАВО
+    ================================================= */
 
     ctx.save();
 
+
     ctx.beginPath();
+
 
     ctx.moveTo(
         size,
         0
     );
 
+
     ctx.lineTo(
         center,
         center
     );
+
 
     ctx.lineTo(
         size,
         size
     );
 
+
     ctx.closePath();
+
 
     ctx.clip();
 
@@ -499,7 +689,8 @@ function drawCube(data, progress) {
 
 
         const currentX =
-            maxX * progress;
+            maxX *
+            progress;
 
 
         ctx.fillStyle =
@@ -515,36 +706,43 @@ function drawCube(data, progress) {
             currentX,
             lineHeight + 1
         );
+
     }
 
 
     ctx.restore();
 
 
-    /*
+    /* =================================================
        ВЕРХ
-    */
+    ================================================= */
 
     ctx.save();
 
+
     ctx.beginPath();
+
 
     ctx.moveTo(
         0,
         0
     );
 
+
     ctx.lineTo(
         size,
         0
     );
+
 
     ctx.lineTo(
         center,
         center
     );
 
+
     ctx.closePath();
+
 
     ctx.clip();
 
@@ -577,7 +775,8 @@ function drawCube(data, progress) {
 
 
         const currentY =
-            maxY * progress;
+            maxY *
+            progress;
 
 
         ctx.fillStyle =
@@ -593,36 +792,43 @@ function drawCube(data, progress) {
             lineWidth + 1,
             currentY
         );
+
     }
 
 
     ctx.restore();
 
 
-    /*
+    /* =================================================
        НИЗ
-    */
+    ================================================= */
 
     ctx.save();
 
+
     ctx.beginPath();
+
 
     ctx.moveTo(
         0,
         size
     );
 
+
     ctx.lineTo(
         center,
         center
     );
+
 
     ctx.lineTo(
         size,
         size
     );
 
+
     ctx.closePath();
+
 
     ctx.clip();
 
@@ -651,7 +857,8 @@ function drawCube(data, progress) {
 
 
         const currentY =
-            maxY * progress;
+            maxY *
+            progress;
 
 
         ctx.fillStyle =
@@ -667,21 +874,27 @@ function drawCube(data, progress) {
             lineWidth + 1,
             currentY
         );
+
     }
 
 
     ctx.restore();
 
 
-    /*
-       ТОЧКА В ЦЕНТРЕ
-    */
+    /* =================================================
+       ЦЕНТР
+    ================================================= */
 
-    if (progress >= 1) {
+    if (
+        progress >= 1
+    ) {
 
-        ctx.fillStyle = "#fff";
+        ctx.fillStyle =
+            "#fff";
+
 
         ctx.beginPath();
+
 
         ctx.arc(
             center,
@@ -691,16 +904,86 @@ function drawCube(data, progress) {
             Math.PI * 2
         );
 
+
         ctx.fill();
+
     }
+
 }
 
 
-/* =========================================================
+/* =====================================================
    АНИМАЦИЯ
-========================================================= */
+===================================================== */
 
 function animateCube(data) {
+
+
+    /*
+       Если включён быстрый режим
+    */
+
+    if (
+        fastModeCheckbox.checked
+    ) {
+
+        if (data.animation) {
+
+            cancelAnimationFrame(
+                data.animation
+            );
+
+            data.animation =
+                null;
+        }
+
+
+        /*
+           Кадр 1:
+           пустой куб
+        */
+
+        data.progress =
+            0;
+
+
+        drawCube(
+            data,
+            0
+        );
+
+
+        /*
+           Кадр 2:
+           полный куб
+        */
+
+        requestAnimationFrame(
+            () => {
+
+                data.progress =
+                    1;
+
+
+                drawCube(
+                    data,
+                    1
+                );
+
+
+                checkAllCubesFilled();
+
+            }
+        );
+
+
+        return;
+    }
+
+
+    /*
+       ОБЫЧНЫЙ РЕЖИМ
+    */
 
     if (data.animation) {
 
@@ -722,7 +1005,8 @@ function animateCube(data) {
 
         data.progress =
             Math.min(
-                elapsed / FILL_TIME,
+                elapsed /
+                FILL_TIME,
                 1
             );
 
@@ -733,35 +1017,48 @@ function animateCube(data) {
         );
 
 
-        if (data.progress < 1) {
+        if (
+            data.progress < 1
+        ) {
 
             data.animation =
-                requestAnimationFrame(frame);
+                requestAnimationFrame(
+                    frame
+                );
 
         } else {
 
-            data.animation = null;
+            data.animation =
+                null;
+
 
             checkAllCubesFilled();
+
         }
+
     }
 
 
-    data.progress = 0;
+    data.progress =
+        0;
 
 
     data.animation =
-        requestAnimationFrame(frame);
+        requestAnimationFrame(
+            frame
+        );
 }
 
 
-/* =========================================================
-   ПРОВЕРКА — ВСЕ ЛИ КУБЫ ЗАПОЛНЕНЫ
-========================================================= */
+/* =====================================================
+   ВСЕ КУБЫ ЗАПОЛНЕНЫ?
+===================================================== */
 
 function checkAllCubesFilled() {
 
-    if (cubes.length === 0) {
+    if (
+        cubes.length === 0
+    ) {
 
         percentageButton.style.display =
             "none";
@@ -772,7 +1069,8 @@ function checkAllCubesFilled() {
 
     const allFilled =
         cubes.every(
-            cube => cube.progress >= 1
+            cube =>
+                cube.progress >= 1
         );
 
 
@@ -785,86 +1083,88 @@ function checkAllCubesFilled() {
 
         percentageButton.style.display =
             "none";
+
     }
 }
 
 
-/* =========================================================
-   ПОИСК САМОГО ЧАСТОГО ЦВЕТА
-========================================================= */
+/* =====================================================
+   САМЫЙ ЧАСТЫЙ ЦВЕТ
+===================================================== */
 
 function getDominantColor(data) {
-
-    /*
-       Цвета создаются случайными,
-       поэтому сравниваем их по hue.
-
-       Объединяем близкие оттенки,
-       чтобы похожие цвета считались
-       одним цветом.
-    */
-
 
     const groups = [];
 
 
-    data.colors.forEach(color => {
+    data.colors.forEach(
+        color => {
 
-        let found = null;
-
-
-        for (const group of groups) {
-
-            let difference =
-                Math.abs(
-                    color.hue -
-                    group.hue
-                );
+            let found =
+                null;
 
 
-            /*
-               Учитываем переход
-               через 360 градусов
-            */
+            for (
+                const group
+                of groups
+            ) {
 
-            difference =
-                Math.min(
-                    difference,
-                    360 - difference
-                );
+                let difference =
+                    Math.abs(
+                        color.hue -
+                        group.hue
+                    );
 
 
-            if (difference <= 5) {
+                difference =
+                    Math.min(
+                        difference,
+                        360 -
+                        difference
+                    );
 
-                found = group;
 
-                break;
+                if (
+                    difference <= 5
+                ) {
+
+                    found =
+                        group;
+
+                    break;
+                }
             }
+
+
+            if (found) {
+
+                found.count++;
+
+            } else {
+
+                groups.push({
+
+                    hue:
+                        color.hue,
+
+                    count:
+                        1,
+
+                    css:
+                        color.css
+
+                });
+
+            }
+
         }
-
-
-        if (found) {
-
-            found.count++;
-
-        } else {
-
-            groups.push({
-
-                hue: color.hue,
-
-                count: 1,
-
-                css: color.css
-
-            });
-        }
-    });
+    );
 
 
     groups.sort(
         (a, b) =>
-            b.count - a.count
+            b.count -
+            a.count
     );
 
 
@@ -872,73 +1172,65 @@ function getDominantColor(data) {
 }
 
 
-/* =========================================================
+/* =====================================================
    ПОКАЗАТЬ ПРОЦЕНТЫ
-========================================================= */
+===================================================== */
 
 function showPercentages() {
 
-    /*
-       Проверяем ещё раз,
-       что все кубы заполнены
-    */
-
     const allFilled =
         cubes.every(
-            cube => cube.progress >= 1
+            cube =>
+                cube.progress >= 1
         );
 
 
     if (!allFilled) {
+
         return;
     }
 
 
-    cubes.forEach(cube => {
+    cubes.forEach(
+        cube => {
 
-        const dominant =
-            getDominantColor(cube);
-
-
-        /*
-           Считаем процент
-           самого частого цвета
-        */
-
-        const percentage =
-            Math.round(
-                dominant.count /
-                LINE_COUNT *
-                100
-            );
+            const dominant =
+                getDominantColor(
+                    cube
+                );
 
 
-        cube.percentage.textContent =
-            `${percentage}%`;
+            const percentage =
+                Math.round(
+                    dominant.count /
+                    LINE_COUNT *
+                    100
+                );
 
 
-        /*
-           Цвет текста такой же,
-           как доминирующий цвет
-        */
-
-        cube.percentage.style.color =
-            dominant.css;
+            cube.percentage.textContent =
+                `${percentage}%`;
 
 
-        cube.percentage.style.display =
-            "block";
+            cube.percentage.style.color =
+                dominant.css;
 
 
-        cube.showPercentage =
-            true;
-    });
+            cube.percentage.style.display =
+                "block";
+
+
+            cube.showPercentage =
+                true;
+
+        }
+    );
 }
 
 
-/* =========================================================
-   РАСКЛАДКА КУБОВ
-========================================================= */
+/* =====================================================
+   РАСКЛАДКА
+===================================================== */
 
 function updateLayout() {
 
@@ -946,7 +1238,10 @@ function updateLayout() {
         cubes.length;
 
 
-    if (count === 0) {
+    if (
+        count === 0
+    ) {
+
         return;
     }
 
@@ -965,11 +1260,16 @@ function updateLayout() {
         gameArea.clientHeight;
 
 
-    let bestColumns = 1;
+    let bestColumns =
+        1;
 
-    let bestRows = count;
 
-    let bestSize = 0;
+    let bestRows =
+        count;
+
+
+    let bestSize =
+        0;
 
 
     for (
@@ -980,14 +1280,16 @@ function updateLayout() {
 
         const rows =
             Math.ceil(
-                count / columns
+                count /
+                columns
             );
 
 
         const width =
             (
                 areaWidth -
-                GAP * (columns - 1)
+                GAP *
+                (columns - 1)
             ) /
             columns;
 
@@ -995,7 +1297,8 @@ function updateLayout() {
         const height =
             (
                 areaHeight -
-                GAP * (rows - 1)
+                GAP *
+                (rows - 1)
             ) /
             rows;
 
@@ -1009,9 +1312,13 @@ function updateLayout() {
             );
 
 
-        if (size > bestSize) {
+        if (
+            size >
+            bestSize
+        ) {
 
-            bestSize = size;
+            bestSize =
+                size;
 
             bestColumns =
                 columns;
@@ -1019,6 +1326,7 @@ function updateLayout() {
             bestRows =
                 rows;
         }
+
     }
 
 
@@ -1037,9 +1345,9 @@ function updateLayout() {
 }
 
 
-/* =========================================================
+/* =====================================================
    КНОПКИ
-========================================================= */
+===================================================== */
 
 function updateButtons() {
 
@@ -1047,10 +1355,14 @@ function updateButtons() {
         cubes.length;
 
 
-    if (count < MAX_CUBES) {
+    if (
+        count <
+        MAX_CUBES
+    ) {
 
         addButton.textContent =
             `Добавить куб ${count}/21`;
+
 
         addButton.disabled =
             false;
@@ -1060,12 +1372,15 @@ function updateButtons() {
         addButton.textContent =
             "Добавить куб 21/21";
 
+
         addButton.disabled =
             true;
     }
 
 
-    if (count >= 2) {
+    if (
+        count >= 2
+    ) {
 
         removeButton.style.display =
             "block";
@@ -1078,9 +1393,9 @@ function updateButtons() {
 }
 
 
-/* =========================================================
-   ДОБАВИТЬ КУБ
-========================================================= */
+/* =====================================================
+   ДОБАВЛЕНИЕ КУБА
+===================================================== */
 
 addButton.addEventListener(
     "click",
@@ -1090,13 +1405,13 @@ addButton.addEventListener(
             cubes.length >=
             MAX_CUBES
         ) {
+
             return;
         }
 
 
         /*
-           После изменения количества
-           кубов проценты скрываем
+           Проценты скрываем
         */
 
         percentageButton.style.display =
@@ -1115,24 +1430,34 @@ addButton.addEventListener(
         requestAnimationFrame(
             () => {
 
-                resizeCube(cube);
+                resizeCube(
+                    cube
+                );
 
-                animateCube(cube);
+
+                animateCube(
+                    cube
+                );
+
             }
         );
+
     }
 );
 
 
-/* =========================================================
-   УБРАТЬ КУБ
-========================================================= */
+/* =====================================================
+   УДАЛЕНИЕ КУБА
+===================================================== */
 
 removeButton.addEventListener(
     "click",
     () => {
 
-        if (cubes.length <= 1) {
+        if (
+            cubes.length <= 1
+        ) {
+
             return;
         }
 
@@ -1145,7 +1470,9 @@ removeButton.addEventListener(
             cubes.pop();
 
 
-        if (removed.animation) {
+        if (
+            removed.animation
+        ) {
 
             cancelAnimationFrame(
                 removed.animation
@@ -1159,13 +1486,14 @@ removeButton.addEventListener(
         updateLayout();
 
         updateButtons();
+
     }
 );
 
 
-/* =========================================================
+/* =====================================================
    ЗАНОВО
-========================================================= */
+===================================================== */
 
 restartButton.addEventListener(
     "click",
@@ -1179,70 +1507,126 @@ restartButton.addEventListener(
             "none";
 
 
-        cubes.forEach(cube => {
+        cubes.forEach(
+            cube => {
 
-            /*
-               Новые случайные цвета
-            */
-
-            cube.colors =
-                generateColors();
+                cube.colors =
+                    generateColors();
 
 
-            /*
-               Скрываем старый процент
-            */
-
-            cube.percentage.style.display =
-                "none";
+                cube.percentage.style.display =
+                    "none";
 
 
-            cube.showPercentage =
-                false;
-        });
+                cube.showPercentage =
+                    false;
+
+            }
+        );
 
 
         /*
-           Запускаем заполнение заново
+           Перезапускаем
         */
 
         cubes.forEach(
             cube =>
-                animateCube(cube)
+                animateCube(
+                    cube
+                )
         );
+
     }
 );
 
 
-/* =========================================================
-   КНОПКА ПРОЦЕНТОВ
-========================================================= */
+/* =====================================================
+   ПРОЦЕНТЫ
+===================================================== */
 
 percentageButton.addEventListener(
     "click",
     () => {
 
         showPercentages();
+
     }
 );
 
 
-/* =========================================================
-   ИЗМЕНЕНИЕ РАЗМЕРА ОКНА
-========================================================= */
+/* =====================================================
+   БЫСТРЫЙ РЕЖИМ
+===================================================== */
+
+fastModeCheckbox.addEventListener(
+    "change",
+    () => {
+
+        /*
+           Проценты скрываем
+        */
+
+        percentageButton.style.display =
+            "none";
+
+
+        /*
+           Перезапускаем
+           все кубы в новом режиме
+        */
+
+        cubes.forEach(
+            cube => {
+
+                if (
+                    cube.animation
+                ) {
+
+                    cancelAnimationFrame(
+                        cube.animation
+                    );
+
+                    cube.animation =
+                        null;
+                }
+
+
+                cube.percentage.style.display =
+                    "none";
+
+
+                cube.showPercentage =
+                    false;
+
+
+                animateCube(
+                    cube
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =====================================================
+   RESIZE
+===================================================== */
 
 window.addEventListener(
     "resize",
     () => {
 
         updateLayout();
+
     }
 );
 
 
-/* =========================================================
+/* =====================================================
    СТАРТ
-========================================================= */
+===================================================== */
 
 createCube();
 
@@ -1258,9 +1642,15 @@ const firstCube =
 requestAnimationFrame(
     () => {
 
-        resizeCube(firstCube);
+        resizeCube(
+            firstCube
+        );
 
-        animateCube(firstCube);
+
+        animateCube(
+            firstCube
+        );
+
     }
 );
 
