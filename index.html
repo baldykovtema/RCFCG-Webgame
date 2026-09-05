@@ -46,6 +46,8 @@ button:disabled{opacity:.4;cursor:default}
 #percentageButton:hover{background:rgba(123,63,198,.48)}
 #leaderboardButton{background:rgba(46,139,87,.35)}
 #leaderboardButton:hover{background:rgba(46,139,87,.48)}
+#musicButton{background:rgba(190,130,40,.35)}
+#musicButton:hover{background:rgba(190,130,40,.48)}
 #logoutButton{position:fixed;top:15px;right:15px;z-index:200;padding:9px 14px;font-size:14px;background:rgba(181,43,43,.35)}
 #logoutButton:hover{background:rgba(181,43,43,.55)}
 #playerStats{position:fixed;top:15px;left:15px;z-index:150;color:white;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:12px 15px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
@@ -113,6 +115,7 @@ button{padding:10px 13px;font-size:14px}
 <button id="restart">Заново</button>
 <button id="percentageButton">Посмотреть проценты до идеала</button>
 <button id="leaderboardButton">Таблицы лидеров</button>
+<button id="musicButton">🔊 Музыка: Вкл</button>
 </div>
 </div>
 <div id="leaderboardScreen">
@@ -163,18 +166,108 @@ const playerStatsName=document.getElementById("playerStatsName");
 const bestPercentageStat=document.getElementById("bestPercentageStat");
 const playTimeStat=document.getElementById("playTimeStat");
 const cubesCompletedStat=document.getElementById("cubesCompletedStat");
+const musicButton=document.getElementById("musicButton");
 let registrationMode=false;
 let currentUser=null;
 let stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,colors:[]};
 let playTimer=null;
 let lastPlaySave=Date.now();
+let audioContext=null;
+let musicGain=null;
+let musicTimer=null;
+let musicEnabled=localStorage.getItem("rcfcg_music_enabled")!=="false";
+let musicStep=0;
+function initAudio(){
+if(!audioContext)audioContext=new(window.AudioContext||window.webkitAudioContext)();
+if(audioContext.state==="suspended")audioContext.resume();
+if(!musicGain){
+musicGain=audioContext.createGain();
+musicGain.gain.value=.055;
+musicGain.connect(audioContext.destination)
+}
+}
+function playTone(frequency,duration,type="sine",volume=.08,delay=0){
+if(!musicEnabled)return;
+initAudio();
+const oscillator=audioContext.createOscillator();
+const gain=audioContext.createGain();
+const start=audioContext.currentTime+delay;
+oscillator.type=type;
+oscillator.frequency.setValueAtTime(frequency,start);
+gain.gain.setValueAtTime(0,start);
+gain.gain.linearRampToValueAtTime(volume,start+.015);
+gain.gain.exponentialRampToValueAtTime(.001,start+duration);
+oscillator.connect(gain);
+gain.connect(audioContext.destination);
+oscillator.start(start);
+oscillator.stop(start+duration+.03)
+}
+function playTaDa(){
+if(!musicEnabled)return;
+initAudio();
+playTone(523.25,.16,"sine",.14,0);
+playTone(659.25,.16,"sine",.13,.12);
+playTone(783.99,.3,"sine",.16,.24);
+playTone(1046.5,.5,"sine",.18,.38)
+}
+function musicTick(){
+if(!musicEnabled)return;
+initAudio();
+const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23,261.63,329.63,392,523.25,392,329.63,293.66,261.63];
+const note=notes[musicStep%notes.length];
+playTone(note,.38,"triangle",.025,0);
+if(musicStep%4===0)playTone(note/2,.7,"sine",.018,0);
+musicStep++;
+}
+function startMusic(){
+if(!musicEnabled)return;
+initAudio();
+if(musicTimer)return;
+musicTick();
+musicTimer=setInterval(musicTick,500)
+}
+function stopMusic(){
+if(musicTimer){clearInterval(musicTimer);musicTimer=null}
+}
+function updateMusicButton(){
+musicButton.textContent=musicEnabled?"🔊 Музыка: Вкл":"🔇 Музыка: Выкл"
+}
 function showAuthMessage(message){authMessage.textContent=message}
 function isValidUsername(username){return /^[a-zA-Z0-9_]{3,30}$/.test(username)}
 function usernameToEmail(username){return username.trim().toLowerCase()+"@rcfcg-game.com"}
-function showGame(){authScreen.style.display="none";game.style.display="block";startPlayTimer();requestAnimationFrame(()=>updateLayout())}
-function showAuth(){stopPlayTimer();game.style.display="none";authScreen.style.display="flex"}
-function enterRegistrationMode(){registrationMode=true;document.getElementById("authTitle").textContent="Регистрация";loginButton.style.display="none";registerText.style.display="none";registerButton.textContent="Создать аккаунт";backToLogin.style.display="block";passwordInput.value="";showAuthMessage("")}
-backToLogin.addEventListener("click",()=>{registrationMode=false;document.getElementById("authTitle").textContent="RCFCG";loginButton.style.display="block";registerText.style.display="block";registerButton.textContent="Зарегистрироваться";backToLogin.style.display="none";showAuthMessage("")});
+function showGame(){
+authScreen.style.display="none";
+game.style.display="block";
+startPlayTimer();
+updateMusicButton();
+if(musicEnabled)startMusic();
+requestAnimationFrame(()=>updateLayout())
+}
+function showAuth(){
+stopPlayTimer();
+stopMusic();
+game.style.display="none";
+authScreen.style.display="flex"
+}
+function enterRegistrationMode(){
+registrationMode=true;
+document.getElementById("authTitle").textContent="Регистрация";
+loginButton.style.display="none";
+registerText.style.display="none";
+registerButton.textContent="Создать аккаунт";
+backToLogin.style.display="block";
+passwordInput.value="";
+showAuthMessage("")
+}
+backToLogin.addEventListener("click",()=>{
+registrationMode=false;
+document.getElementById("authTitle").textContent="RCFCG";
+loginButton.style.display="block";
+registerText.style.display="block";
+registerButton.textContent="Зарегистрироваться";
+backToLogin.style.display="none";
+showAuthMessage("")
+});
 registerButton.addEventListener("click",async()=>{
 if(!registrationMode){enterRegistrationMode();return}
 const username=usernameInput.value.trim().toLowerCase();
@@ -186,7 +279,13 @@ showAuthMessage("Создание аккаунта...");
 const {data,error}=await supabaseClient.auth.signUp({email:usernameToEmail(username),password:password,options:{data:{username:username}}});
 registerButton.disabled=false;
 if(error){showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);return}
-if(data.session){showAuthMessage("");currentUser=data.user;await loadPlayerStats(data.user);showGame();return}
+if(data.session){
+showAuthMessage("");
+currentUser=data.user;
+await loadPlayerStats(data.user);
+showGame();
+return
+}
 showAuthMessage("Аккаунт создан. Проверь настройки Confirm email в Supabase.");
 registrationMode=false;
 document.getElementById("authTitle").textContent="RCFCG";
@@ -209,13 +308,26 @@ if(error){showAuthMessage("Неверный логин или пароль.");re
 currentUser=data.user;
 await loadPlayerStats(currentUser);
 showAuthMessage("");
-showGame();
+initAudio();
+showGame()
 });
 usernameInput.addEventListener("keydown",event=>{if(event.key==="Enter")passwordInput.focus()});
 passwordInput.addEventListener("keydown",event=>{if(event.key==="Enter")registrationMode?registerButton.click():loginButton.click()});
+musicButton.addEventListener("click",()=>{
+musicEnabled=!musicEnabled;
+localStorage.setItem("rcfcg_music_enabled",musicEnabled?"true":"false");
+updateMusicButton();
+if(musicEnabled){
+initAudio();
+startMusic()
+}else{
+stopMusic()
+}
+});
 logoutButton.addEventListener("click",async()=>{
 await savePlayerStats();
 stopPlayTimer();
+stopMusic();
 await supabaseClient.auth.signOut();
 currentUser=null;
 showAuth();
@@ -227,11 +339,15 @@ loginButton.style.display="block";
 registerText.style.display="block";
 registerButton.textContent="Зарегистрироваться";
 backToLogin.style.display="none";
-showAuthMessage("");
+showAuthMessage("")
 });
 async function checkSession(){
 const {data}=await supabaseClient.auth.getSession();
-if(data.session){currentUser=data.session.user;await loadPlayerStats(currentUser);showGame()}else showAuth()
+if(data.session){
+currentUser=data.session.user;
+await loadPlayerStats(currentUser);
+showGame()
+}else showAuth()
 }
 async function loadPlayerStats(user){
 if(!user)return;
@@ -242,9 +358,9 @@ stats.bestPercentage=Number(data.best_percentage||0);
 stats.dominantColor=data.dominant_color||"white";
 stats.totalPlaySeconds=Number(data.total_play_seconds||0);
 stats.cubesCompleted=Number(data.cubes_completed||0);
-stats.colors=Array.isArray(data.colors)?data.colors:[];
+stats.colors=Array.isArray(data.colors)?data.colors:[]
 }else{
-stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,colors:[]};
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,colors:[]}
 }
 updateStatsUI()
 }
@@ -254,7 +370,7 @@ playerStatsName.textContent=username;
 bestPercentageStat.textContent=stats.bestPercentage+"%";
 bestPercentageStat.style.color=stats.dominantColor;
 playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
-cubesCompletedStat.textContent=stats.cubesCompleted;
+cubesCompletedStat.textContent=stats.cubesCompleted
 }
 function formatTime(seconds){
 seconds=Math.floor(seconds);
@@ -267,7 +383,7 @@ const secs=seconds%60;
 if(days>0)return `${days}д ${hours}ч`;
 if(hours>0)return `${hours}ч ${minutes}м`;
 if(minutes>0)return `${minutes}м ${secs}с`;
-return `${secs}с`;
+return `${secs}с`
 }
 function startPlayTimer(){
 if(playTimer||!currentUser)return;
@@ -279,7 +395,7 @@ if(delta>0){
 stats.totalPlaySeconds+=delta;
 lastPlaySave=now;
 updateStatsUI();
-if(stats.totalPlaySeconds%10<delta)await savePlayerStats();
+if(stats.totalPlaySeconds%10<delta)await savePlayerStats()
 }
 },1000)
 }
@@ -497,6 +613,7 @@ stats.bestPercentage=best.percentage;
 stats.dominantColor=best.dominantCss;
 stats.colors=best.colors;
 updateStatsUI();
+playTaDa();
 await savePlayerStats()
 }else if(best&&stats.bestPercentage===best.percentage&&(!stats.colors||stats.colors.length!==LINE_COUNT)){
 stats.dominantColor=best.dominantCss;
@@ -532,6 +649,7 @@ removeButton.style.display=count>=2?"block":"none"
 }
 addButton.addEventListener("click",()=>{
 if(cubes.length>=MAX_CUBES)return;
+initAudio();
 percentageButton.style.display="none";
 const cube=createCube();
 updateLayout();
@@ -548,6 +666,7 @@ updateLayout();
 updateButtons()
 });
 restartButton.addEventListener("click",()=>{
+initAudio();
 percentageButton.style.display="none";
 cubes.forEach(cube=>{
 if(cube.animation)cancelAnimationFrame(cube.animation);
@@ -555,12 +674,13 @@ cube.colors=generateColors();
 cube.progress=0;
 cube.counted=false;
 cube.percentage.style.display="none";
-cube.showPercentage=false;
+cube.showPercentage=false
 });
 cubes.forEach(animateCube)
 });
 percentageButton.addEventListener("click",showPercentages);
 fastModeCheckbox.addEventListener("change",()=>{
+initAudio();
 percentageButton.style.display="none";
 cubes.forEach(cube=>{
 if(cube.animation)cancelAnimationFrame(cube.animation);
@@ -592,7 +712,7 @@ percentageEl.textContent="";
 percentageEl.style.color="white";
 valueEl.textContent="";
 nameEl.textContent="—";
-slot.querySelector(".lbCubeWrap").style.display="none";
+slot.querySelector(".lbCubeWrap").style.display="none"
 })
 }
 function renderLeaderboardSlot(slot,row,mode){
@@ -618,14 +738,14 @@ if(colors.length===LINE_COUNT){
 drawCube({canvas:canvas,colors:colors.map(css=>({css:css}))},1)
 }else{
 ctx.fillStyle="#000";
-ctx.fillRect(0,0,canvas.width,canvas.height);
+ctx.fillRect(0,0,canvas.width,canvas.height)
 }
 percentageEl.textContent=Number(row.best_percentage||0)+"%";
-percentageEl.style.color=row.dominant_color||"white";
+percentageEl.style.color=row.dominant_color||"white"
 }else if(mode==="time"){
-valueEl.textContent=formatTime(Number(row.total_play_seconds||0));
+valueEl.textContent=formatTime(Number(row.total_play_seconds||0))
 }else if(mode==="cubes"){
-valueEl.textContent="Кубов открыто: "+Number(row.cubes_completed||0);
+valueEl.textContent="Кубов открыто: "+Number(row.cubes_completed||0)
 }
 }
 async function loadLeaderboard(mode){
@@ -667,11 +787,11 @@ requestAnimationFrame(updateLayout)
 window.addEventListener("beforeunload",()=>{savePlayerStats()});
 createCube();
 updateLayout();
-updateButtons();
 requestAnimationFrame(()=>{
 resizeCube(cubes[0]);
 animateCube(cubes[0])
 });
+updateMusicButton();
 checkSession();
 </script>
 </body>
