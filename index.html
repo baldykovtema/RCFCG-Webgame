@@ -1,9 +1,8 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>RCFCG</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -29,10 +28,18 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;font-f
 .cube{position:relative;width:100%;aspect-ratio:1/1;background:#000;overflow:hidden}
 canvas{display:block;width:100%;height:100%}
 .percentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:white;font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none;z-index:10;display:none}
+#playerStats{position:fixed;top:15px;left:15px;z-index:150;color:white;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:12px 15px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#playerStatsName{font-size:18px;font-weight:bold;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.statLine{font-size:14px;margin-top:4px;color:rgba(255,255,255,.8)}
+#bestPercentageStat{font-weight:bold}
+#unlockProgress{margin-top:7px;color:rgba(255,255,255,.65);font-size:12px;line-height:1.3}
 #controls{position:fixed;left:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:100}
 #fastMode{display:flex;align-items:center;gap:8px;color:white;font-size:16px;font-weight:bold;cursor:pointer;user-select:none;margin-bottom:2px}
+#fastMode.locked{color:rgba(255,255,255,.35);cursor:not-allowed}
 #fastMode input{width:18px;height:18px;margin:0;cursor:pointer}
-button{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:12px 18px;font-size:16px;font-weight:bold;color:white;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;transition:background .2s,border-color .2s,transform .15s}
+#fastMode input:disabled{cursor:not-allowed}
+#fastModeHint{font-size:11px;color:rgba(255,255,255,.45);font-weight:normal;margin-left:26px;margin-top:-5px}
+button{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:12px 18px;font-size:16px;font-weight:bold;color:white;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;transition:.2s}
 button:hover{border-color:rgba(255,255,255,.28)}
 button:active{transform:scale(.98)}
 button:disabled{opacity:.4;cursor:default}
@@ -46,38 +53,37 @@ button:disabled{opacity:.4;cursor:default}
 #percentageButton:hover{background:rgba(123,63,198,.48)}
 #leaderboardButton{background:rgba(46,139,87,.35)}
 #leaderboardButton:hover{background:rgba(46,139,87,.48)}
-#musicButton{background:rgba(190,130,40,.35)}
-#musicButton:hover{background:rgba(190,130,40,.48)}
+#musicButton{background:rgba(190,120,40,.35)}
+#musicButton:hover{background:rgba(190,120,40,.48)}
+#unlockInfo{position:fixed;right:20px;bottom:20px;z-index:120;color:white;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:11px 15px;font-size:14px;text-align:right;box-shadow:0 8px 30px rgba(0,0,0,.25);max-width:280px}
 #logoutButton{position:fixed;top:15px;right:15px;z-index:200;padding:9px 14px;font-size:14px;background:rgba(181,43,43,.35)}
 #logoutButton:hover{background:rgba(181,43,43,.55)}
-#playerStats{position:fixed;top:15px;left:15px;z-index:150;color:white;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:12px 15px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
-#playerStatsName{font-size:18px;font-weight:bold;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
-.statLine{font-size:14px;margin-top:4px;color:rgba(255,255,255,.8)}
-#bestPercentageStat{font-weight:bold}
 #leaderboardScreen{position:fixed;inset:0;background:#111;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:900;padding:20px}
-#leaderboardTitle{color:white;font-size:clamp(24px,4vw,40px);font-weight:bold;margin-bottom:20px}
-#leaderboardTabs{display:flex;gap:8px;margin-bottom:30px;flex-wrap:wrap;justify-content:center}
-.leaderboardTab{background:rgba(255,255,255,.08);padding:10px 20px}
-.leaderboardTab.active{background:rgba(46,139,87,.55);border-color:rgba(255,255,255,.4)}
+#leaderboardTitle{color:white;font-size:clamp(24px,4vw,40px);font-weight:bold;margin-bottom:25px}
+#leaderboardTabs{display:flex;gap:8px;margin-bottom:25px;flex-wrap:wrap;justify-content:center}
+.lbTab{background:rgba(255,255,255,.08)}
+.lbTab.active{background:rgba(46,139,87,.5);border-color:rgba(255,255,255,.35)}
 #podium{display:flex;gap:40px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
 .lbSlot{display:flex;flex-direction:column;align-items:center;width:min(26vw,240px);min-width:150px}
 .lbRank{font-size:clamp(28px,5vw,52px);font-weight:bold;margin-bottom:12px;text-shadow:0 2px 6px rgba(0,0,0,.8)}
 .lbCubeWrap{position:relative;width:100%;aspect-ratio:1/1;background:#000;overflow:hidden}
 .lbCubeWrap canvas{display:block;width:100%;height:100%}
 .lbPercentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none}
-.lbValue{color:white;font-size:clamp(18px,3vw,28px);font-weight:bold;margin-top:15px;text-align:center}
+.lbExtra{margin-top:5px;color:rgba(255,255,255,.7);font-size:13px;text-align:center}
 .lbName{margin-top:12px;color:white;font-size:clamp(14px,2vw,20px);font-weight:bold;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#leaderboardMessage{min-height:22px;margin-top:25px;color:rgba(255,255,255,.6);font-size:15px}
+#leaderboardMessage{min-height:22px;margin-top:20px;color:rgba(255,255,255,.6);font-size:15px}
 #leaderboardBack{margin-top:10px;background:rgba(68,68,68,.35)}
-#leaderboardBack:hover{background:rgba(68,68,68,.48)}
 @media(max-width:600px){
 #playerStats{min-width:155px;padding:9px 11px}
 #playerStatsName{font-size:16px}
 .statLine{font-size:12px}
+#unlockInfo{right:10px;bottom:10px;font-size:12px;max-width:210px;padding:8px 10px}
 #controls{left:10px;bottom:10px}
 button{padding:10px 13px;font-size:14px}
+#fastMode{font-size:14px}
+#fastModeHint{font-size:10px}
 #podium{gap:15px}
-.lbSlot{min-width:100px;width:28vw}
+.lbSlot{min-width:110px}
 }
 </style>
 </head>
@@ -100,48 +106,51 @@ button{padding:10px 13px;font-size:14px}
 <div class="statLine">Лучший процент: <span id="bestPercentageStat">0%</span></div>
 <div class="statLine">Время игры: <span id="playTimeStat">0с</span></div>
 <div class="statLine">Кубов пройдено: <span id="cubesCompletedStat">0</span></div>
+<div id="unlockProgress"></div>
 </div>
 <div id="gameArea">
 <div id="cubes"></div>
 </div>
+<div id="unlockInfo"></div>
 <button id="logoutButton">Выйти</button>
 <div id="controls">
 <label id="fastMode">
 <input type="checkbox" id="fastModeCheckbox">
 <span>Быстрый режим</span>
 </label>
-<button id="addCube">Добавить куб 1/21</button>
+<div id="fastModeHint"></div>
+<button id="addCube">Добавить куб</button>
 <button id="removeCube" style="display:none;">Убрать куб</button>
 <button id="restart">Заново</button>
 <button id="percentageButton">Посмотреть проценты до идеала</button>
-<button id="leaderboardButton">Таблицы лидеров</button>
+<button id="leaderboardButton">Таблица лидеров</button>
 <button id="musicButton">🔊 Музыка: Вкл</button>
 </div>
 </div>
 <div id="leaderboardScreen">
 <div id="leaderboardTitle">Таблица лидеров</div>
 <div id="leaderboardTabs">
-<button class="leaderboardTab active" id="timeLeaderboardButton">Время</button>
-<button class="leaderboardTab" id="cubesLeaderboardButton">Кубы</button>
-<button class="leaderboardTab" id="percentageLeaderboardButton">Проценты</button>
+<button class="lbTab active" id="timeLeaderboardButton">Время</button>
+<button class="lbTab" id="cubesLeaderboardButton">Кубы</button>
+<button class="lbTab" id="percentageLeaderboardButton">Проценты</button>
 </div>
 <div id="podium">
 <div class="lbSlot" id="slot0">
 <div class="lbRank" style="color:#ffd700">1</div>
 <div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
-<div class="lbValue"></div>
+<div class="lbExtra"></div>
 <div class="lbName">—</div>
 </div>
 <div class="lbSlot" id="slot1">
 <div class="lbRank" style="color:#c0c0c0">2</div>
 <div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
-<div class="lbValue"></div>
+<div class="lbExtra"></div>
 <div class="lbName">—</div>
 </div>
 <div class="lbSlot" id="slot2">
 <div class="lbRank" style="color:#cd7f32">3</div>
 <div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
-<div class="lbValue"></div>
+<div class="lbExtra"></div>
 <div class="lbName">—</div>
 </div>
 </div>
@@ -166,81 +175,85 @@ const playerStatsName=document.getElementById("playerStatsName");
 const bestPercentageStat=document.getElementById("bestPercentageStat");
 const playTimeStat=document.getElementById("playTimeStat");
 const cubesCompletedStat=document.getElementById("cubesCompletedStat");
+const unlockProgress=document.getElementById("unlockProgress");
+const unlockInfo=document.getElementById("unlockInfo");
 const musicButton=document.getElementById("musicButton");
+const fastMode=document.getElementById("fastMode");
+const fastModeCheckbox=document.getElementById("fastModeCheckbox");
+const fastModeHint=document.getElementById("fastModeHint");
 let registrationMode=false;
 let currentUser=null;
-let stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,colors:[]};
+let stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0};
 let playTimer=null;
 let lastPlaySave=Date.now();
-let audioContext=null;
-let musicGain=null;
-let musicTimer=null;
-let musicEnabled=localStorage.getItem("rcfcg_music_enabled")!=="false";
-let musicStep=0;
-function initAudio(){
-if(!audioContext)audioContext=new(window.AudioContext||window.webkitAudioContext)();
-if(audioContext.state==="suspended")audioContext.resume();
-if(!musicGain){
-musicGain=audioContext.createGain();
-musicGain.gain.value=.055;
-musicGain.connect(audioContext.destination)
+const MAX_CUBES=21;
+const LINE_COUNT=80;
+const FILL_TIME=3000;
+const GAP=10;
+const FAST_MODE_UNLOCK_CUBES=10;
+const UNLOCK_REQUIREMENTS=[0,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000,2500000,5000000,10000000,25000000];
+const cubesContainer=document.getElementById("cubes");
+const addButton=document.getElementById("addCube");
+const removeButton=document.getElementById("removeCube");
+const restartButton=document.getElementById("restart");
+const percentageButton=document.getElementById("percentageButton");
+let cubes=[];
+function getUnlockedCubes(){
+let unlocked=1;
+for(let i=1;i<UNLOCK_REQUIREMENTS.length;i++){
+if(stats.cubesCompleted>=UNLOCK_REQUIREMENTS[i])unlocked=i+1;
+else break
+}
+return unlocked
+}
+function isFastModeUnlocked(){
+return getUnlockedCubes()>=FAST_MODE_UNLOCK_CUBES
+}
+function updateFastModeUI(){
+const unlocked=isFastModeUnlocked();
+fastModeCheckbox.disabled=!unlocked;
+fastMode.classList.toggle("locked",!unlocked);
+if(!unlocked){
+fastModeCheckbox.checked=false;
+fastModeHint.textContent=`🔒 Откроется на 10 кубах`;
+localStorage.setItem("rcfcg_fast_mode","false")
+}else{
+fastModeHint.textContent="Быстрое заполнение куба";
+const saved=localStorage.getItem("rcfcg_fast_mode");
+if(saved==="true")fastModeCheckbox.checked=true
 }
 }
-function playTone(frequency,duration,type="sine",volume=.08,delay=0){
-if(!musicEnabled)return;
-initAudio();
-const oscillator=audioContext.createOscillator();
-const gain=audioContext.createGain();
-const start=audioContext.currentTime+delay;
-oscillator.type=type;
-oscillator.frequency.setValueAtTime(frequency,start);
-gain.gain.setValueAtTime(0,start);
-gain.gain.linearRampToValueAtTime(volume,start+.015);
-gain.gain.exponentialRampToValueAtTime(.001,start+duration);
-oscillator.connect(gain);
-gain.connect(audioContext.destination);
-oscillator.start(start);
-oscillator.stop(start+duration+.03)
+function getNextUnlock(){
+const unlocked=getUnlockedCubes();
+if(unlocked>=MAX_CUBES)return null;
+return{cubes:unlocked+1,required:UNLOCK_REQUIREMENTS[unlocked]}
 }
-function playTaDa(){
-if(!musicEnabled)return;
-initAudio();
-playTone(523.25,.16,"sine",.14,0);
-playTone(659.25,.16,"sine",.13,.12);
-playTone(783.99,.3,"sine",.16,.24);
-playTone(1046.5,.5,"sine",.18,.38)
+function formatNumber(number){
+return Number(number).toLocaleString("ru-RU")
 }
-function musicTick(){
-if(!musicEnabled)return;
-initAudio();
-const notes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23,261.63,329.63,392,523.25,392,329.63,293.66,261.63];
-const note=notes[musicStep%notes.length];
-playTone(note,.38,"triangle",.025,0);
-if(musicStep%4===0)playTone(note/2,.7,"sine",.018,0);
-musicStep++;
+function updateUnlockUI(){
+const unlocked=getUnlockedCubes();
+const next=getNextUnlock();
+if(!next){
+unlockInfo.textContent="Все 21 куб открыты!";
+unlockProgress.textContent="Открыто кубов: 21/21";
+}else{
+const missing=Math.max(0,next.required-stats.cubesCompleted);
+unlockInfo.innerHTML=`До ${next.cubes} кубов осталось: <b>${formatNumber(missing)}</b>`;
+unlockProgress.textContent=`Открыто кубов: ${unlocked}/21`
 }
-function startMusic(){
-if(!musicEnabled)return;
-initAudio();
-if(musicTimer)return;
-musicTick();
-musicTimer=setInterval(musicTick,500)
-}
-function stopMusic(){
-if(musicTimer){clearInterval(musicTimer);musicTimer=null}
-}
-function updateMusicButton(){
-musicButton.textContent=musicEnabled?"🔊 Музыка: Вкл":"🔇 Музыка: Выкл"
+updateFastModeUI()
 }
 function showAuthMessage(message){authMessage.textContent=message}
-function isValidUsername(username){return /^[a-zA-Z0-9_]{3,30}$/.test(username)}
+function isValidUsername(username){return/^[a-zA-Z0-9_]{3,30}$/.test(username)}
 function usernameToEmail(username){return username.trim().toLowerCase()+"@rcfcg-game.com"}
 function showGame(){
 authScreen.style.display="none";
 game.style.display="block";
 startPlayTimer();
-updateMusicButton();
-if(musicEnabled)startMusic();
+startMusic();
+updateUnlockUI();
+updateButtons();
 requestAnimationFrame(()=>updateLayout())
 }
 function showAuth(){
@@ -276,23 +289,20 @@ if(!isValidUsername(username)){showAuthMessage("Логин: 3–30 символ�
 if(password.length<6){showAuthMessage("Пароль должен содержать минимум 6 символов.");return}
 registerButton.disabled=true;
 showAuthMessage("Создание аккаунта...");
-const {data,error}=await supabaseClient.auth.signUp({email:usernameToEmail(username),password:password,options:{data:{username:username}}});
+const{data,error}=await supabaseClient.auth.signUp({email:usernameToEmail(username),password:password,options:{data:{username:username}}});
 registerButton.disabled=false;
-if(error){showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);return}
+if(error){
+showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);
+return
+}
 if(data.session){
 showAuthMessage("");
 currentUser=data.user;
-await loadPlayerStats(data.user);
+await loadPlayerStats(currentUser);
 showGame();
 return
 }
-showAuthMessage("Аккаунт создан. Проверь настройки Confirm email в Supabase.");
-registrationMode=false;
-document.getElementById("authTitle").textContent="RCFCG";
-loginButton.style.display="block";
-registerText.style.display="block";
-registerButton.textContent="Зарегистрироваться";
-backToLogin.style.display="none";
+showAuthMessage("Аккаунт создан. Если включено подтверждение email, подтверди его в Supabase.")
 });
 loginButton.addEventListener("click",async()=>{
 const username=usernameInput.value.trim().toLowerCase();
@@ -302,28 +312,16 @@ if(!password){showAuthMessage("Введите пароль.");return}
 if(!isValidUsername(username)){showAuthMessage("Неверный логин.");return}
 loginButton.disabled=true;
 showAuthMessage("Выполняется вход...");
-const {data,error}=await supabaseClient.auth.signInWithPassword({email:usernameToEmail(username),password:password});
+const{data,error}=await supabaseClient.auth.signInWithPassword({email:usernameToEmail(username),password:password});
 loginButton.disabled=false;
 if(error){showAuthMessage("Неверный логин или пароль.");return}
 currentUser=data.user;
 await loadPlayerStats(currentUser);
 showAuthMessage("");
-initAudio();
-showGame()
+showGame();
 });
 usernameInput.addEventListener("keydown",event=>{if(event.key==="Enter")passwordInput.focus()});
 passwordInput.addEventListener("keydown",event=>{if(event.key==="Enter")registrationMode?registerButton.click():loginButton.click()});
-musicButton.addEventListener("click",()=>{
-musicEnabled=!musicEnabled;
-localStorage.setItem("rcfcg_music_enabled",musicEnabled?"true":"false");
-updateMusicButton();
-if(musicEnabled){
-initAudio();
-startMusic()
-}else{
-stopMusic()
-}
-});
 logoutButton.addEventListener("click",async()=>{
 await savePlayerStats();
 stopPlayTimer();
@@ -342,7 +340,7 @@ backToLogin.style.display="none";
 showAuthMessage("")
 });
 async function checkSession(){
-const {data}=await supabaseClient.auth.getSession();
+const{data}=await supabaseClient.auth.getSession();
 if(data.session){
 currentUser=data.session.user;
 await loadPlayerStats(currentUser);
@@ -351,16 +349,15 @@ showGame()
 }
 async function loadPlayerStats(user){
 if(!user)return;
-const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors").eq("user_id",user.id).maybeSingle();
+const{data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors").eq("user_id",user.id).maybeSingle();
 if(error){console.error("Stats load:",error);return}
 if(data){
 stats.bestPercentage=Number(data.best_percentage||0);
 stats.dominantColor=data.dominant_color||"white";
 stats.totalPlaySeconds=Number(data.total_play_seconds||0);
-stats.cubesCompleted=Number(data.cubes_completed||0);
-stats.colors=Array.isArray(data.colors)?data.colors:[]
+stats.cubesCompleted=Number(data.cubes_completed||0)
 }else{
-stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,colors:[]}
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0}
 }
 updateStatsUI()
 }
@@ -370,7 +367,8 @@ playerStatsName.textContent=username;
 bestPercentageStat.textContent=stats.bestPercentage+"%";
 bestPercentageStat.style.color=stats.dominantColor;
 playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
-cubesCompletedStat.textContent=stats.cubesCompleted
+cubesCompletedStat.textContent=formatNumber(stats.cubesCompleted);
+updateUnlockUI()
 }
 function formatTime(seconds){
 seconds=Math.floor(seconds);
@@ -380,10 +378,10 @@ const hours=Math.floor(seconds/3600);
 seconds%=3600;
 const minutes=Math.floor(seconds/60);
 const secs=seconds%60;
-if(days>0)return `${days}д ${hours}ч`;
-if(hours>0)return `${hours}ч ${minutes}м`;
-if(minutes>0)return `${minutes}м ${secs}с`;
-return `${secs}с`
+if(days>0)return`${days}д ${hours}ч`;
+if(hours>0)return`${hours}ч ${minutes}м`;
+if(minutes>0)return`${minutes}м ${secs}с`;
+return`${secs}с`
 }
 function startPlayTimer(){
 if(playTimer||!currentUser)return;
@@ -405,29 +403,75 @@ if(playTimer){clearInterval(playTimer);playTimer=null}
 async function savePlayerStats(){
 if(!currentUser)return;
 const username=currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Игрок";
-const payload={
+const{error}=await supabaseClient.from("leaderboard").upsert({
 user_id:currentUser.id,
 username:username,
 best_percentage:stats.bestPercentage,
 dominant_color:stats.dominantColor,
 total_play_seconds:stats.totalPlaySeconds,
-cubes_completed:stats.cubesCompleted,
-colors:stats.colors||[]
-};
-const {error}=await supabaseClient.from("leaderboard").upsert(payload,{onConflict:"user_id"});
+cubes_completed:stats.cubesCompleted
+},{onConflict:"user_id"});
 if(error)console.error("Stats save:",error)
 }
-const MAX_CUBES=21;
-const LINE_COUNT=80;
-const FILL_TIME=3000;
-const GAP=10;
-const cubesContainer=document.getElementById("cubes");
-const addButton=document.getElementById("addCube");
-const removeButton=document.getElementById("removeCube");
-const restartButton=document.getElementById("restart");
-const percentageButton=document.getElementById("percentageButton");
-const fastModeCheckbox=document.getElementById("fastModeCheckbox");
-let cubes=[];
+let audioContext=null;
+let musicTimer=null;
+let musicEnabled=localStorage.getItem("rcfcg_music_enabled")!=="false";
+const musicNotes=[261.63,329.63,392,329.63,293.66,349.23,440,349.23,261.63,329.63,392,523.25,392,329.63,293.66,261.63];
+let musicIndex=0;
+function initAudio(){
+if(!audioContext)audioContext=new(window.AudioContext||window.webkitAudioContext)();
+if(audioContext.state==="suspended")audioContext.resume()
+}
+function playTone(freq,duration,type="sine",volume=.12,delay=0){
+if(!musicEnabled)return;
+initAudio();
+const osc=audioContext.createOscillator();
+const gain=audioContext.createGain();
+osc.type=type;
+osc.frequency.value=freq;
+gain.gain.setValueAtTime(.0001,audioContext.currentTime+delay);
+gain.gain.exponentialRampToValueAtTime(volume,audioContext.currentTime+delay+.015);
+gain.gain.exponentialRampToValueAtTime(.0001,audioContext.currentTime+delay+duration);
+osc.connect(gain);
+gain.connect(audioContext.destination);
+osc.start(audioContext.currentTime+delay);
+osc.stop(audioContext.currentTime+delay+duration+.03)
+}
+function playTaDa(){
+if(!musicEnabled)return;
+initAudio();
+playTone(523.25,.16,"sine",.14,0);
+playTone(659.25,.16,"sine",.13,.12);
+playTone(783.99,.3,"sine",.16,.24);
+playTone(1046.5,.5,"sine",.18,.38)
+}
+function musicTick(){
+if(!musicEnabled)return;
+playTone(musicNotes[musicIndex],.22,"triangle",.055,0);
+musicIndex=(musicIndex+1)%musicNotes.length
+}
+function startMusic(){
+if(!musicEnabled)return;
+initAudio();
+if(musicTimer)return;
+musicTimer=setInterval(musicTick,350)
+}
+function stopMusic(){
+if(musicTimer){clearInterval(musicTimer);musicTimer=null}
+}
+function updateMusicButton(){
+musicButton.textContent=musicEnabled?"🔊 Музыка: Вкл":"🔇 Музыка: Выкл"
+}
+musicButton.addEventListener("click",()=>{
+musicEnabled=!musicEnabled;
+localStorage.setItem("rcfcg_music_enabled",musicEnabled?"true":"false");
+updateMusicButton();
+if(musicEnabled){
+initAudio();
+startMusic()
+}else stopMusic()
+});
+updateMusicButton();
 function randomColor(){
 const hue=Math.floor(Math.random()*360);
 const saturation=75+Math.random()*25;
@@ -538,7 +582,7 @@ ctx.fill()
 }
 function animateCube(data){
 data.counted=false;
-if(fastModeCheckbox.checked){
+if(fastModeCheckbox.checked&&isFastModeUnlocked()){
 if(data.animation)cancelAnimationFrame(data.animation);
 data.progress=0;
 drawCube(data,0);
@@ -570,9 +614,19 @@ function completeCube(data){
 if(data.counted)return;
 if(data.progress<1)return;
 data.counted=true;
+const oldUnlocked=getUnlockedCubes();
 stats.cubesCompleted++;
+const newUnlocked=getUnlockedCubes();
 updateStatsUI();
-savePlayerStats()
+savePlayerStats();
+if(newUnlocked>oldUnlocked)playTaDa();
+updateButtons();
+if(!isFastModeUnlocked()&&newUnlocked>=FAST_MODE_UNLOCK_CUBES){
+fastModeCheckbox.disabled=false;
+fastMode.classList.remove("locked");
+fastModeHint.textContent="Быстрое заполнение куба";
+playTaDa()
+}
 }
 function checkAllCubesFilled(){
 if(cubes.length===0){percentageButton.style.display="none";return}
@@ -604,22 +658,28 @@ cube.percentage.textContent=percentage+"%";
 cube.percentage.style.color=dominant.css;
 cube.percentage.style.display="block";
 cube.showPercentage=true;
-if(!best||percentage>best.percentage){
-best={percentage:percentage,dominantCss:dominant.css,colors:cube.colors.map(color=>color.css)}
-}
+if(!best||percentage>best.percentage)best={percentage:percentage,dominantCss:dominant.css,colors:cube.colors}
 });
 if(best&&best.percentage>stats.bestPercentage){
 stats.bestPercentage=best.percentage;
 stats.dominantColor=best.dominantCss;
-stats.colors=best.colors;
 updateStatsUI();
-playTaDa();
-await savePlayerStats()
-}else if(best&&stats.bestPercentage===best.percentage&&(!stats.colors||stats.colors.length!==LINE_COUNT)){
-stats.dominantColor=best.dominantCss;
-stats.colors=best.colors;
-await savePlayerStats()
+await saveBestPercentage(best)
 }
+}
+async function saveBestPercentage(best){
+if(!currentUser)return;
+const username=currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Игрок";
+const{error}=await supabaseClient.from("leaderboard").upsert({
+user_id:currentUser.id,
+username:username,
+best_percentage:best.percentage,
+dominant_color:best.dominantCss,
+total_play_seconds:stats.totalPlaySeconds,
+cubes_completed:stats.cubesCompleted,
+colors:best.colors.map(color=>color.css)
+},{onConflict:"user_id"});
+if(error)console.error("Best percentage save:",error)
 }
 function updateLayout(){
 const count=cubes.length;
@@ -642,19 +702,31 @@ cubesContainer.style.gridTemplateRows=`repeat(${bestRows},${bestSize}px)`;
 cubes.forEach(resizeCube)
 }
 function updateButtons(){
+const unlocked=getUnlockedCubes();
 const count=cubes.length;
-if(count<MAX_CUBES){addButton.textContent=`Добавить куб ${count}/21`;addButton.disabled=false}
-else{addButton.textContent="Добавить куб 21/21";addButton.disabled=true}
+if(count<unlocked){
+addButton.textContent=`Добавить куб ${count}/${unlocked}`;
+addButton.disabled=false
+}else if(unlocked<MAX_CUBES){
+addButton.textContent=`🔒 Куб ${unlocked+1} закрыт`;
+addButton.disabled=true
+}else{
+addButton.textContent="Добавить куб 21/21";
+addButton.disabled=true
+}
 removeButton.style.display=count>=2?"block":"none"
 }
 addButton.addEventListener("click",()=>{
-if(cubes.length>=MAX_CUBES)return;
-initAudio();
+const unlocked=getUnlockedCubes();
+if(cubes.length>=unlocked)return;
 percentageButton.style.display="none";
 const cube=createCube();
 updateLayout();
 updateButtons();
-requestAnimationFrame(()=>{resizeCube(cube);animateCube(cube)})
+requestAnimationFrame(()=>{
+resizeCube(cube);
+animateCube(cube)
+})
 });
 removeButton.addEventListener("click",()=>{
 if(cubes.length<=1)return;
@@ -666,7 +738,6 @@ updateLayout();
 updateButtons()
 });
 restartButton.addEventListener("click",()=>{
-initAudio();
 percentageButton.style.display="none";
 cubes.forEach(cube=>{
 if(cube.animation)cancelAnimationFrame(cube.animation);
@@ -680,7 +751,11 @@ cubes.forEach(animateCube)
 });
 percentageButton.addEventListener("click",showPercentages);
 fastModeCheckbox.addEventListener("change",()=>{
-initAudio();
+if(!isFastModeUnlocked()){
+fastModeCheckbox.checked=false;
+return
+}
+localStorage.setItem("rcfcg_fast_mode",fastModeCheckbox.checked?"true":"false");
 percentageButton.style.display="none";
 cubes.forEach(cube=>{
 if(cube.animation)cancelAnimationFrame(cube.animation);
@@ -699,67 +774,57 @@ const cubesLeaderboardButton=document.getElementById("cubesLeaderboardButton");
 const percentageLeaderboardButton=document.getElementById("percentageLeaderboardButton");
 const leaderboardSlots=[document.getElementById("slot0"),document.getElementById("slot1"),document.getElementById("slot2")];
 let leaderboardMode="time";
-function clearLeaderboardSlots(){
-leaderboardSlots.forEach(slot=>{
-const canvas=slot.querySelector("canvas");
-const percentageEl=slot.querySelector(".lbPercentage");
-const valueEl=slot.querySelector(".lbValue");
-const nameEl=slot.querySelector(".lbName");
-const ctx=canvas.getContext("2d");
-ctx.clearRect(0,0,canvas.width,canvas.height);
-canvas.style.display="block";
-percentageEl.textContent="";
-percentageEl.style.color="white";
-valueEl.textContent="";
-nameEl.textContent="—";
-slot.querySelector(".lbCubeWrap").style.display="none"
-})
-}
-function renderLeaderboardSlot(slot,row,mode){
-const canvas=slot.querySelector("canvas");
-const percentageEl=slot.querySelector(".lbPercentage");
-const valueEl=slot.querySelector(".lbValue");
-const nameEl=slot.querySelector(".lbName");
-const wrap=slot.querySelector(".lbCubeWrap");
-const ctx=canvas.getContext("2d");
-ctx.clearRect(0,0,canvas.width,canvas.height);
-percentageEl.textContent="";
-valueEl.textContent="";
-nameEl.textContent=row?row.username:"—";
-wrap.style.display="none";
-if(!row)return;
-if(mode==="percentage"){
-wrap.style.display="block";
-const size=Math.floor(wrap.getBoundingClientRect().width);
-canvas.width=size>0?size:200;
-canvas.height=canvas.width;
-const colors=Array.isArray(row.colors)?row.colors:[];
-if(colors.length===LINE_COUNT){
-drawCube({canvas:canvas,colors:colors.map(css=>({css:css}))},1)
-}else{
-ctx.fillStyle="#000";
-ctx.fillRect(0,0,canvas.width,canvas.height)
-}
-percentageEl.textContent=Number(row.best_percentage||0)+"%";
-percentageEl.style.color=row.dominant_color||"white"
-}else if(mode==="time"){
-valueEl.textContent=formatTime(Number(row.total_play_seconds||0))
-}else if(mode==="cubes"){
-valueEl.textContent="Кубов открыто: "+Number(row.cubes_completed||0)
-}
-}
-async function loadLeaderboard(mode){
+function setLeaderboardMode(mode){
 leaderboardMode=mode;
 timeLeaderboardButton.classList.toggle("active",mode==="time");
 cubesLeaderboardButton.classList.toggle("active",mode==="cubes");
 percentageLeaderboardButton.classList.toggle("active",mode==="percentage");
-clearLeaderboardSlots();
+loadLeaderboard()
+}
+timeLeaderboardButton.addEventListener("click",()=>setLeaderboardMode("time"));
+cubesLeaderboardButton.addEventListener("click",()=>setLeaderboardMode("cubes"));
+percentageLeaderboardButton.addEventListener("click",()=>setLeaderboardMode("percentage"));
+function renderLeaderboardSlot(slot,row){
+const canvas=slot.querySelector("canvas");
+const percentageEl=slot.querySelector(".lbPercentage");
+const nameEl=slot.querySelector(".lbName");
+const extraEl=slot.querySelector(".lbExtra");
+const wrap=slot.querySelector(".lbCubeWrap");
+const size=Math.floor(wrap.getBoundingClientRect().width);
+canvas.width=size>0?size:200;
+canvas.height=canvas.width;
+const ctx=canvas.getContext("2d");
+ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.fillStyle="#000";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+if(!row){
+percentageEl.textContent="";
+extraEl.textContent="";
+nameEl.textContent="—";
+return
+}
+if(leaderboardMode==="percentage"){
+const colors=Array.isArray(row.colors)?row.colors:[];
+if(colors.length===LINE_COUNT){
+drawCube({canvas:canvas,colors:colors.map(css=>({css:css}))},1)
+}
+percentageEl.textContent=Number(row.best_percentage||0)+"%";
+percentageEl.style.color=row.dominant_color||"white";
+extraEl.textContent="";
+nameEl.textContent=row.username
+}else{
+percentageEl.textContent="";
+extraEl.textContent=leaderboardMode==="time"?formatTime(row.total_play_seconds||0):`Кубов открыто: ${row.cubes_completed||0}`;
+nameEl.textContent=row.username
+}
+}
+async function loadLeaderboard(){
 leaderboardMessage.textContent="Загрузка...";
 let query=supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors").limit(3);
-if(mode==="time")query=query.order("total_play_seconds",{ascending:false});
-if(mode==="cubes")query=query.order("cubes_completed",{ascending:false});
-if(mode==="percentage")query=query.order("best_percentage",{ascending:false});
-const {data,error}=await query;
+if(leaderboardMode==="time")query=query.order("total_play_seconds",{ascending:false});
+if(leaderboardMode==="cubes")query=query.order("cubes_completed",{ascending:false});
+if(leaderboardMode==="percentage")query=query.order("best_percentage",{ascending:false});
+const{data,error}=await query;
 if(error){
 console.error("Leaderboard load:",error);
 leaderboardMessage.textContent="Не удалось загрузить таблицу лидеров.";
@@ -767,33 +832,33 @@ return
 }
 leaderboardMessage.textContent=data.length?"":"Пока нет результатов.";
 requestAnimationFrame(()=>{
-leaderboardSlots.forEach((slot,index)=>renderLeaderboardSlot(slot,data[index]||null,mode))
+leaderboardSlots.forEach((slot,index)=>renderLeaderboardSlot(slot,data[index]||null))
 })
 }
 leaderboardButton.addEventListener("click",async()=>{
-await savePlayerStats();
 game.style.display="none";
 leaderboardScreen.style.display="flex";
-await loadLeaderboard("time")
+leaderboardMode="time";
+timeLeaderboardButton.classList.add("active");
+cubesLeaderboardButton.classList.remove("active");
+percentageLeaderboardButton.classList.remove("active");
+await loadLeaderboard()
 });
-timeLeaderboardButton.addEventListener("click",()=>loadLeaderboard("time"));
-cubesLeaderboardButton.addEventListener("click",()=>loadLeaderboard("cubes"));
-percentageLeaderboardButton.addEventListener("click",()=>loadLeaderboard("percentage"));
 leaderboardBack.addEventListener("click",()=>{
 leaderboardScreen.style.display="none";
 game.style.display="block";
 requestAnimationFrame(updateLayout)
 });
-window.addEventListener("beforeunload",()=>{savePlayerStats()});
 createCube();
 updateLayout();
+updateButtons();
+updateFastModeUI();
 requestAnimationFrame(()=>{
 resizeCube(cubes[0]);
 animateCube(cubes[0])
 });
-updateMusicButton();
+window.addEventListener("beforeunload",()=>{savePlayerStats()});
 checkSession();
 </script>
 </body>
 </html>
-```
