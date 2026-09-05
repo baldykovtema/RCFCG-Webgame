@@ -3,7 +3,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>RCFCG</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -11,28 +11,28 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;font-family:Arial,sans-serif}
 #authScreen{position:fixed;inset:0;background:#111;display:flex;justify-content:center;align-items:center;z-index:1000}
 #authBox{width:360px;max-width:90vw;padding:30px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 15px 50px rgba(0,0,0,.5);text-align:center}
-#authTitle{margin:0 0 28px;color:white;font-size:30px;font-weight:bold}
-.authInput{width:100%;height:44px;margin-bottom:12px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);outline:none;background:rgba(0,0,0,.35);color:white;font-size:16px}
+#authTitle{margin:0 0 28px;color:#fff;font-size:30px;font-weight:bold}
+.authInput{width:100%;height:44px;margin-bottom:12px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);outline:none;background:rgba(0,0,0,.35);color:#fff;font-size:16px}
 .authInput::placeholder{color:rgba(255,255,255,.55)}
 .authInput:focus{border-color:rgba(255,255,255,.4)}
-#loginButton,#registerButton{width:100%;height:44px;border:1px solid rgba(255,255,255,.18);border-radius:8px;color:white;font-size:16px;font-weight:bold;cursor:pointer;transition:.2s}
+#loginButton,#registerButton{width:100%;height:44px;border:1px solid rgba(255,255,255,.18);border-radius:8px;color:#fff;font-size:16px;font-weight:bold;cursor:pointer;transition:.2s}
 #loginButton{background:rgba(36,107,206,.55);margin-top:8px}
 #loginButton:hover{background:rgba(36,107,206,.75)}
 #registerButton{background:rgba(123,63,198,.45);margin-top:10px}
 #registerButton:hover{background:rgba(123,63,198,.65)}
 #loginButton:active,#registerButton:active{transform:scale(.98)}
 #authMessage{min-height:22px;margin-top:15px;color:#ff7777;font-size:14px;line-height:1.4}
-#backToLogin{display:none;width:100%;margin-top:10px;padding:11px;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:white;background:rgba(255,255,255,.08);cursor:pointer}
+#backToLogin{display:none;width:100%;margin-top:10px;padding:11px;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;background:rgba(255,255,255,.08);cursor:pointer}
 #game{display:none;width:100%;height:100%}
 #gameArea{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92vw;height:88vh;display:flex;justify-content:center;align-items:center}
 #cubes{display:grid;justify-content:center;align-content:center;gap:10px}
 .cube{position:relative;width:100%;aspect-ratio:1/1;background:#000;overflow:hidden}
 canvas{display:block;width:100%;height:100%}
-.percentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:white;font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none;z-index:10;display:none}
+.percentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none;z-index:10;display:none}
 #controls{position:fixed;left:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:100}
-#fastMode{display:flex;align-items:center;gap:8px;color:white;font-size:16px;font-weight:bold;cursor:pointer;user-select:none;margin-bottom:2px}
+#fastMode{display:flex;align-items:center;gap:8px;color:#fff;font-size:16px;font-weight:bold;cursor:pointer;user-select:none;margin-bottom:2px}
 #fastMode input{width:18px;height:18px;margin:0;cursor:pointer}
-button{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:12px 18px;font-size:16px;font-weight:bold;color:white;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;transition:background .2s,border-color .2s,transform .15s}
+button{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:12px 18px;font-size:16px;font-weight:bold;color:#fff;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;transition:.2s}
 button:hover{border-color:rgba(255,255,255,.28)}
 button:active{transform:scale(.98)}
 button:disabled{opacity:.4;cursor:default}
@@ -48,22 +48,22 @@ button:disabled{opacity:.4;cursor:default}
 #leaderboardButton:hover{background:rgba(46,139,87,.48)}
 #logoutButton{position:fixed;top:15px;right:15px;z-index:200;padding:9px 14px;font-size:14px;background:rgba(181,43,43,.35)}
 #logoutButton:hover{background:rgba(181,43,43,.55)}
+#playerStats{position:fixed;top:15px;left:15px;z-index:150;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:12px 15px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#playerStatsName{font-size:18px;font-weight:bold;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.statLine{font-size:14px;margin-top:4px;color:rgba(255,255,255,.8)}
+#bestPercentageStat{font-weight:bold}
 #leaderboardScreen{position:fixed;inset:0;background:#111;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:900;padding:20px}
-#leaderboardTitle{color:white;font-size:clamp(24px,4vw,40px);font-weight:bold;margin-bottom:40px}
+#leaderboardTitle{color:#fff;font-size:clamp(24px,4vw,40px);font-weight:bold;margin-bottom:40px}
 #podium{display:flex;gap:40px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
 .lbSlot{display:flex;flex-direction:column;align-items:center;width:min(26vw,240px);min-width:150px}
 .lbRank{font-size:clamp(28px,5vw,52px);font-weight:bold;margin-bottom:12px;text-shadow:0 2px 6px rgba(0,0,0,.8)}
 .lbCubeWrap{position:relative;width:100%;aspect-ratio:1/1;background:#000;overflow:hidden}
 .lbCubeWrap canvas{display:block;width:100%;height:100%}
 .lbPercentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none}
-.lbName{margin-top:12px;color:white;font-size:clamp(14px,2vw,20px);font-weight:bold;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbName{margin-top:12px;color:#fff;font-size:clamp(14px,2vw,20px);font-weight:bold;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #leaderboardMessage{min-height:22px;margin-top:25px;color:rgba(255,255,255,.6);font-size:15px}
 #leaderboardBack{margin-top:10px;background:rgba(68,68,68,.35)}
 #leaderboardBack:hover{background:rgba(68,68,68,.48)}
-#playerStats{position:fixed;top:15px;left:15px;z-index:150;color:white;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:12px 15px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
-#playerStatsName{font-size:18px;font-weight:bold;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
-.statLine{font-size:14px;margin-top:4px;color:rgba(255,255,255,.8)}
-#bestPercentageStat{font-weight:bold}
 @media(max-width:600px){
 #playerStats{min-width:155px;padding:9px 11px}
 #playerStatsName{font-size:16px}
@@ -93,17 +93,12 @@ button{padding:10px 13px;font-size:14px}
 <div class="statLine">Время игры: <span id="playTimeStat">0с</span></div>
 <div class="statLine">Кубов пройдено: <span id="cubesCompletedStat">0</span></div>
 </div>
-<div id="gameArea">
-<div id="cubes"></div>
-</div>
+<div id="gameArea"><div id="cubes"></div></div>
 <button id="logoutButton">Выйти</button>
 <div id="controls">
-<label id="fastMode">
-<input type="checkbox" id="fastModeCheckbox">
-<span>Быстрый режим</span>
-</label>
+<label id="fastMode"><input type="checkbox" id="fastModeCheckbox"><span>Быстрый режим</span></label>
 <button id="addCube">Добавить куб 1/21</button>
-<button id="removeCube" style="display:none;">Убрать куб</button>
+<button id="removeCube" style="display:none">Убрать куб</button>
 <button id="restart">Заново</button>
 <button id="percentageButton">Посмотреть проценты до идеала</button>
 <button id="leaderboardButton">Таблица лидеров</button>
@@ -142,14 +137,120 @@ let currentUser=null;
 let stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0};
 let playTimer=null;
 let lastPlaySave=Date.now();
-
+let savingStats=false;
 function showAuthMessage(message){authMessage.textContent=message}
 function isValidUsername(username){return /^[a-zA-Z0-9_]{3,30}$/.test(username)}
 function usernameToEmail(username){return username.trim().toLowerCase()+"@rcfcg-game.com"}
-function showGame(){authScreen.style.display="none";game.style.display="block";startPlayTimer();requestAnimationFrame(()=>updateLayout())}
-function showAuth(){stopPlayTimer();game.style.display="none";authScreen.style.display="flex"}
-function enterRegistrationMode(){registrationMode=true;document.getElementById("authTitle").textContent="Регистрация";loginButton.style.display="none";registerText.style.display="none";registerButton.textContent="Создать аккаунт";backToLogin.style.display="block";passwordInput.value="";showAuthMessage("")}
-backToLogin.addEventListener("click",()=>{registrationMode=false;document.getElementById("authTitle").textContent="RCFCG";loginButton.style.display="block";registerText.style.display="block";registerButton.textContent="Зарегистрироваться";backToLogin.style.display="none";showAuthMessage("")});
+function updateStatsUI(){
+const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
+playerStatsName.textContent=username;
+bestPercentageStat.textContent=stats.bestPercentage+"%";
+bestPercentageStat.style.color=stats.dominantColor||"white";
+playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
+cubesCompletedStat.textContent=stats.cubesCompleted;
+}
+function formatTime(seconds){
+seconds=Math.floor(seconds);
+const days=Math.floor(seconds/86400);
+seconds%=86400;
+const hours=Math.floor(seconds/3600);
+seconds%=3600;
+const minutes=Math.floor(seconds/60);
+const secs=seconds%60;
+if(days>0)return `${days}д ${hours}ч`;
+if(hours>0)return `${hours}ч ${minutes}м`;
+if(minutes>0)return `${minutes}м ${secs}с`;
+return `${secs}с`;
+}
+async function loadPlayerStats(user){
+if(!user)return;
+const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed").eq("user_id",user.id).maybeSingle();
+if(error){console.error("Stats load:",error);return}
+if(data){
+stats.bestPercentage=Number(data.best_percentage||0);
+stats.dominantColor=data.dominant_color||"white";
+stats.totalPlaySeconds=Number(data.total_play_seconds||0);
+stats.cubesCompleted=Number(data.cubes_completed||0);
+}else{
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0};
+await savePlayerStats();
+}
+updateStatsUI();
+}
+async function savePlayerStats(){
+if(!currentUser||savingStats)return;
+savingStats=true;
+const username=currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Игрок";
+const payload={
+user_id:currentUser.id,
+username:username,
+best_percentage:Number(stats.bestPercentage)||0,
+dominant_color:stats.dominantColor||"white",
+total_play_seconds:Number(stats.totalPlaySeconds)||0,
+cubes_completed:Number(stats.cubesCompleted)||0
+};
+const {error}=await supabaseClient.from("leaderboard").upsert(payload,{onConflict:"user_id"});
+if(error)console.error("Stats save:",error);
+savingStats=false;
+}
+function startPlayTimer(){
+if(playTimer||!currentUser)return;
+lastPlaySave=Date.now();
+playTimer=setInterval(async()=>{
+const now=Date.now();
+const delta=Math.floor((now-lastPlaySave)/1000);
+if(delta>0){
+stats.totalPlaySeconds+=delta;
+lastPlaySave=now;
+updateStatsUI();
+if(stats.totalPlaySeconds%10<delta)await savePlayerStats();
+}
+},1000);
+}
+async function stopPlayTimer(){
+if(playTimer){
+const now=Date.now();
+const delta=Math.floor((now-lastPlaySave)/1000);
+if(delta>0){
+stats.totalPlaySeconds+=delta;
+lastPlaySave=now;
+updateStatsUI();
+}
+clearInterval(playTimer);
+playTimer=null;
+}
+await savePlayerStats();
+}
+function showGame(){
+authScreen.style.display="none";
+game.style.display="block";
+updateStatsUI();
+startPlayTimer();
+requestAnimationFrame(updateLayout);
+}
+function showAuth(){
+game.style.display="none";
+authScreen.style.display="flex";
+}
+function enterRegistrationMode(){
+registrationMode=true;
+document.getElementById("authTitle").textContent="Регистрация";
+loginButton.style.display="none";
+registerText.style.display="none";
+registerButton.textContent="Создать аккаунт";
+backToLogin.style.display="block";
+passwordInput.value="";
+showAuthMessage("");
+}
+backToLogin.addEventListener("click",()=>{
+registrationMode=false;
+document.getElementById("authTitle").textContent="RCFCG";
+loginButton.style.display="block";
+registerText.style.display="block";
+registerButton.textContent="Зарегистрироваться";
+backToLogin.style.display="none";
+showAuthMessage("");
+});
 registerButton.addEventListener("click",async()=>{
 if(!registrationMode){enterRegistrationMode();return}
 const username=usernameInput.value.trim().toLowerCase();
@@ -160,8 +261,18 @@ registerButton.disabled=true;
 showAuthMessage("Создание аккаунта...");
 const {data,error}=await supabaseClient.auth.signUp({email:usernameToEmail(username),password:password,options:{data:{username:username}}});
 registerButton.disabled=false;
-if(error){showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);return}
-if(data.session){showAuthMessage("");await loadPlayerStats(data.user);showGame();return}
+if(error){
+showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);
+return;
+}
+if(data.session){
+currentUser=data.user;
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0};
+await savePlayerStats();
+showAuthMessage("");
+showGame();
+return;
+}
 showAuthMessage("Аккаунт создан. Проверь настройки Confirm email в Supabase.");
 registrationMode=false;
 document.getElementById("authTitle").textContent="RCFCG";
@@ -188,75 +299,28 @@ showGame();
 });
 usernameInput.addEventListener("keydown",event=>{if(event.key==="Enter")passwordInput.focus()});
 passwordInput.addEventListener("keydown",event=>{if(event.key==="Enter")registrationMode?registerButton.click():loginButton.click()});
-logoutButton.addEventListener("click",async()=>{await savePlayerStats();stopPlayTimer();await supabaseClient.auth.signOut();currentUser=null;showAuth();usernameInput.value="";passwordInput.value="";registrationMode=false;document.getElementById("authTitle").textContent="RCFCG";loginButton.style.display="block";registerText.style.display="block";registerButton.textContent="Зарегистрироваться";backToLogin.style.display="none";showAuthMessage("")});
+logoutButton.addEventListener("click",async()=>{
+await stopPlayTimer();
+await supabaseClient.auth.signOut();
+currentUser=null;
+showAuth();
+usernameInput.value="";
+passwordInput.value="";
+registrationMode=false;
+document.getElementById("authTitle").textContent="RCFCG";
+loginButton.style.display="block";
+registerText.style.display="block";
+registerButton.textContent="Зарегистрироваться";
+backToLogin.style.display="none";
+showAuthMessage("");
+});
 async function checkSession(){
 const {data}=await supabaseClient.auth.getSession();
-if(data.session){currentUser=data.session.user;await loadPlayerStats(currentUser);showGame()}else showAuth()
-}
-async function loadPlayerStats(user){
-if(!user)return;
-const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed").eq("user_id",user.id).maybeSingle();
-if(error){console.error("Stats load:",error);return}
-if(data){
-stats.bestPercentage=Number(data.best_percentage||0);
-stats.dominantColor=data.dominant_color||"white";
-stats.totalPlaySeconds=Number(data.total_play_seconds||0);
-stats.cubesCompleted=Number(data.cubes_completed||0);
-}else{
-stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0};
-}
-updateStatsUI()
-}
-function updateStatsUI(){
-const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
-playerStatsName.textContent=username;
-bestPercentageStat.textContent=stats.bestPercentage+"%";
-bestPercentageStat.style.color=stats.dominantColor;
-playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
-cubesCompletedStat.textContent=stats.cubesCompleted;
-}
-function formatTime(seconds){
-seconds=Math.floor(seconds);
-const days=Math.floor(seconds/86400);
-seconds%=86400;
-const hours=Math.floor(seconds/3600);
-seconds%=3600;
-const minutes=Math.floor(seconds/60);
-const secs=seconds%60;
-if(days>0)return `${days}д ${hours}ч`;
-if(hours>0)return `${hours}ч ${minutes}м`;
-if(minutes>0)return `${minutes}м ${secs}с`;
-return `${secs}с`;
-}
-function startPlayTimer(){
-if(playTimer||!currentUser)return;
-lastPlaySave=Date.now();
-playTimer=setInterval(async()=>{
-const now=Date.now();
-const delta=Math.floor((now-lastPlaySave)/1000);
-if(delta>0){
-stats.totalPlaySeconds+=delta;
-lastPlaySave=now;
-updateStatsUI();
-if(stats.totalPlaySeconds%10<delta)await savePlayerStats();
-}
-},1000)
-}
-function stopPlayTimer(){
-if(playTimer){clearInterval(playTimer);playTimer=null}
-}
-async function savePlayerStats(){
-if(!currentUser)return;
-const username=currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Игрок";
-const {error}=await supabaseClient.from("leaderboard").upsert({
-user_id:currentUser.id,
-username:username,
-best_percentage:stats.bestPercentage,
-dominant_color:stats.dominantColor,
-total_play_seconds:stats.totalPlaySeconds,
-cubes_completed:stats.cubesCompleted
-},{onConflict:"user_id"});
-if(error)console.error("Stats save:",error)
+if(data.session){
+currentUser=data.session.user;
+await loadPlayerStats(currentUser);
+showGame();
+}else showAuth();
 }
 const MAX_CUBES=21;
 const LINE_COUNT=80;
@@ -392,17 +456,15 @@ data.progress=0;
 data.animation=requestAnimationFrame(frame)
 }
 function completeCube(data){
-if(data.counted)return;
-if(data.progress<1)return;
+if(data.counted||data.progress<1)return;
 data.counted=true;
 stats.cubesCompleted++;
 updateStatsUI();
-savePlayerStats()
+savePlayerStats();
 }
 function checkAllCubesFilled(){
-if(cubes.length===0){percentageButton.style.display="none";return}
-const allFilled=cubes.every(cube=>cube.progress>=1);
-percentageButton.style.display=allFilled?"block":"none"
+if(!cubes.length){percentageButton.style.display="none";return}
+percentageButton.style.display=cubes.every(cube=>cube.progress>=1)?"block":"none"
 }
 function getDominantColor(data){
 const groups=[];
@@ -435,7 +497,7 @@ if(best&&best.percentage>stats.bestPercentage){
 stats.bestPercentage=best.percentage;
 stats.dominantColor=best.dominantCss;
 updateStatsUI();
-await savePlayerStats()
+await savePlayerStats();
 }
 }
 function updateLayout(){
@@ -460,9 +522,9 @@ cubes.forEach(resizeCube)
 }
 function updateButtons(){
 const count=cubes.length;
-if(count<MAX_CUBES){addButton.textContent=`Добавить куб ${count}/21`;addButton.disabled=false}
-else{addButton.textContent="Добавить куб 21/21";addButton.disabled=true}
-removeButton.style.display=count>=2?"block":"none"
+addButton.textContent=count<MAX_CUBES?`Добавить куб ${count}/21`:"Добавить куб 21/21";
+addButton.disabled=count>=MAX_CUBES;
+removeButton.style.display=count>=2?"block":"none";
 }
 addButton.addEventListener("click",()=>{
 if(cubes.length>=MAX_CUBES)return;
@@ -479,7 +541,7 @@ const removed=cubes.pop();
 if(removed.animation)cancelAnimationFrame(removed.animation);
 removed.element.remove();
 updateLayout();
-updateButtons()
+updateButtons();
 });
 restartButton.addEventListener("click",()=>{
 percentageButton.style.display="none";
@@ -491,7 +553,7 @@ cube.counted=false;
 cube.percentage.style.display="none";
 cube.showPercentage=false;
 });
-cubes.forEach(animateCube)
+cubes.forEach(animateCube);
 });
 percentageButton.addEventListener("click",showPercentages);
 fastModeCheckbox.addEventListener("change",()=>{
@@ -501,7 +563,7 @@ if(cube.animation)cancelAnimationFrame(cube.animation);
 cube.percentage.style.display="none";
 cube.showPercentage=false;
 animateCube(cube)
-})
+});
 });
 window.addEventListener("resize",updateLayout);
 const leaderboardButton=document.getElementById("leaderboardButton");
@@ -527,27 +589,34 @@ percentageEl.style.color=row.dominant_color||"white";
 nameEl.textContent=row.username
 }
 leaderboardButton.addEventListener("click",async()=>{
+await savePlayerStats();
 game.style.display="none";
 leaderboardScreen.style.display="flex";
 leaderboardMessage.textContent="Загрузка...";
 const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,colors").order("best_percentage",{ascending:false}).limit(3);
 if(error){console.error("Leaderboard load:",error);leaderboardMessage.textContent="Не удалось загрузить таблицу лидеров.";return}
 leaderboardMessage.textContent=data.length?"":"Пока нет результатов.";
-requestAnimationFrame(()=>leaderboardSlots.forEach((slot,index)=>renderLeaderboardSlot(slot,data[index]||null)))
+requestAnimationFrame(()=>leaderboardSlots.forEach((slot,index)=>renderLeaderboardSlot(slot,data[index]||null)));
 });
 leaderboardBack.addEventListener("click",()=>{
 leaderboardScreen.style.display="none";
 game.style.display="block";
-requestAnimationFrame(updateLayout)
+requestAnimationFrame(updateLayout);
 });
 createCube();
 updateLayout();
 updateButtons();
 requestAnimationFrame(()=>{
 resizeCube(cubes[0]);
-animateCube(cubes[0])
+animateCube(cubes[0]);
 });
-window.addEventListener("beforeunload",()=>{savePlayerStats()});
+window.addEventListener("beforeunload",()=>{
+if(currentUser){
+const username=currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Игрок";
+const payload=new URLSearchParams();
+savePlayerStats();
+}
+});
 checkSession();
 </script>
 </body>
