@@ -77,21 +77,21 @@ body {
 }
 
 #loginButton {
-    background: rgba(36, 107, 206, .55);
+    background: rgba(36, 107, 206, .25);
     margin-top: 8px
 }
 
 #loginButton:hover {
-    background: rgba(36, 107, 206, .75)
+    background: rgba(36, 107, 206, .35)
 }
 
 #registerButton {
-    background: rgba(123, 63, 198, .45);
+    background: rgba(123, 63, 198, .2);
     margin-top: 10px
 }
 
 #registerButton:hover {
-    background: rgba(123, 63, 198, .65)
+    background: rgba(123, 63, 198, .3)
 }
 
 #loginButton:active,
@@ -164,7 +164,7 @@ canvas {
     top: 50%;
     transform: translate(-50%, -50%);
     color: #fff;
-    font-size: clamp(18px, 4vw, 42px);
+    font-size: clamp(45px, 10vw, 105px);
     font-weight: bold;
     text-shadow: 0 2px 4px rgba(0, 0, 0, .9), 0 0 8px rgba(0, 0, 0, .9);
     pointer-events: none;
@@ -208,7 +208,7 @@ button {
     font-size: 16px;
     font-weight: bold;
     color: #fff;
-    background: rgba(255, 255, 255, .1);
+    background: rgba(255, 255, 255, .06);
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     cursor: pointer;
@@ -229,35 +229,35 @@ button:disabled {
 }
 
 #addCube {
-    background: rgba(36, 107, 206, .35)
+    background: rgba(36, 107, 206, .2)
 }
 
 #addCube:hover {
-    background: rgba(36, 107, 206, .48)
+    background: rgba(36, 107, 206, .3)
 }
 
 #removeCube {
-    background: rgba(181, 43, 43, .35)
+    background: rgba(181, 43, 43, .2)
 }
 
 #removeCube:hover {
-    background: rgba(181, 43, 43, .48)
+    background: rgba(181, 43, 43, .3)
 }
 
 #restart {
-    background: rgba(68, 68, 68, .35)
+    background: rgba(68, 68, 68, .2)
 }
 
 #restart:hover {
-    background: rgba(68, 68, 68, .48)
+    background: rgba(68, 68, 68, .3)
 }
 
 #leaderboardButton {
-    background: rgba(46, 139, 87, .35)
+    background: rgba(46, 139, 87, .2)
 }
 
 #leaderboardButton:hover {
-    background: rgba(46, 139, 87, .48)
+    background: rgba(46, 139, 87, .3)
 }
 
 #logoutButton {
@@ -267,11 +267,11 @@ button:disabled {
     z-index: 200;
     padding: 9px 14px;
     font-size: 14px;
-    background: rgba(181, 43, 43, .35)
+    background: rgba(181, 43, 43, .2)
 }
 
 #logoutButton:hover {
-    background: rgba(181, 43, 43, .55)
+    background: rgba(181, 43, 43, .3)
 }
 
 #playerStats {
@@ -361,13 +361,13 @@ button:disabled {
 
 #adminSaveButton {
     width: 100%;
-    background: rgba(46, 139, 87, .45)
+    background: rgba(46, 139, 87, .25)
 }
 
 #adminResetButton {
     width: 100%;
     margin-top: 7px;
-    background: rgba(181, 43, 43, .35)
+    background: rgba(181, 43, 43, .2)
 }
 
 #adminMessage {
@@ -406,11 +406,11 @@ button:disabled {
 
 .lbTab {
     padding: 10px 20px;
-    background: rgba(255, 255, 255, .1)
+    background: rgba(255, 255, 255, .06)
 }
 
 .lbTab.active {
-    background: rgba(123, 63, 198, .5)
+    background: rgba(123, 63, 198, .3)
 }
 
 #podium {
@@ -455,7 +455,7 @@ button:disabled {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    font-size: clamp(18px, 4vw, 42px);
+    font-size: clamp(45px, 10vw, 105px);
     font-weight: bold;
     text-shadow: 0 2px 4px rgba(0, 0, 0, .9), 0 0 8px rgba(0, 0, 0, .9);
     pointer-events: none
@@ -481,11 +481,11 @@ button:disabled {
 
 #leaderboardBack {
     margin-top: 10px;
-    background: rgba(68, 68, 68, .35)
+    background: rgba(68, 68, 68, .2)
 }
 
 #leaderboardBack:hover {
-    background: rgba(68, 68, 68, .48)
+    background: rgba(68, 68, 68, .3)
 }
 
 @media(max-width:600px) {
