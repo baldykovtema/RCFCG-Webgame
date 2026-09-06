@@ -120,18 +120,18 @@ function drawCube(data, progress) {
 
 function animateCube(data) {
     data.counted = false;
+    if (data.animation) cancelAnimationFrame(data.animation);
+    data.progress = 0;
+    drawCube(data, 0);
     if (fastModeCheckbox.checked) {
-        if (data.animation) cancelAnimationFrame(data.animation);
-        data.progress = 0;
-        drawCube(data, 0);
-        requestAnimationFrame(() => {
+        data.animation = requestAnimationFrame(() => {
+            data.animation = null;
             data.progress = 1;
             drawCube(data, 1);
             completeCube(data);
         });
         return;
     }
-    if (data.animation) cancelAnimationFrame(data.animation);
     const start = performance.now();
     function frame(now) {
         const elapsed = now - start;
@@ -144,7 +144,6 @@ function animateCube(data) {
             completeCube(data);
         }
     }
-    data.progress = 0;
     data.animation = requestAnimationFrame(frame);
 }
 
@@ -230,13 +229,8 @@ function updateButtons() {
     addButton.textContent = `Добавить куб ${count}/${maxAllowed}`;
     addButton.disabled = addingCube || count >= maxAllowed;
     removeButton.style.display = count >= 2 ? "block" : "none";
-    fastModeCheckbox.disabled = count < 10;
-    if (count < 10) {
-        fastModeCheckbox.checked = false;
-        fastModeCheckbox.title = "Быстрый режим откроется на 10 кубах";
-    } else {
-        fastModeCheckbox.title = "";
-    }
+    fastModeCheckbox.disabled = false;
+    fastModeCheckbox.title = "";
 }
 
 addButton.addEventListener("click", () => {
@@ -287,16 +281,14 @@ restartButton.addEventListener("click", () => {
 });
 
 fastModeCheckbox.addEventListener("change", () => {
-    if (cubes.length < 10) {
-        fastModeCheckbox.checked = false;
-        return;
-    }
     cubes.forEach(cube => {
         if (cube.animation) cancelAnimationFrame(cube.animation);
+        cube.animation = null;
         cube.progress = 0;
         cube.counted = false;
         cube.showPercentage = false;
         cube.percentage.style.display = "none";
+        cube.percentage.textContent = "0%";
         animateCube(cube);
     });
 });
