@@ -1,9 +1,8 @@
-```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>RCFCG</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
@@ -11,32 +10,28 @@
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#111;font-family:Arial,sans-serif}
 #authScreen{position:fixed;inset:0;background:#111;display:flex;justify-content:center;align-items:center;z-index:1000}
 #authBox{width:360px;max-width:90vw;padding:30px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 15px 50px rgba(0,0,0,.5);text-align:center}
-#authTitle{margin:0 0 28px;color:white;font-size:30px;font-weight:bold}
-.authInput{width:100%;height:44px;margin-bottom:12px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);outline:none;background:rgba(0,0,0,.35);color:white;font-size:16px}
+#authTitle{margin:0 0 28px;color:#fff;font-size:30px;font-weight:bold}
+.authInput{width:100%;height:44px;margin-bottom:12px;padding:0 14px;border-radius:8px;border:1px solid rgba(255,255,255,.15);outline:none;background:rgba(0,0,0,.35);color:#fff;font-size:16px}
 .authInput::placeholder{color:rgba(255,255,255,.55)}
 .authInput:focus{border-color:rgba(255,255,255,.4)}
-#loginButton,#registerButton{width:100%;height:44px;border:1px solid rgba(255,255,255,.18);border-radius:8px;color:white;font-size:16px;font-weight:bold;cursor:pointer;transition:.2s}
+#loginButton,#registerButton{width:100%;height:44px;border:1px solid rgba(255,255,255,.18);border-radius:8px;color:#fff;font-size:16px;font-weight:bold;cursor:pointer;transition:.2s}
 #loginButton{background:rgba(36,107,206,.55);margin-top:8px}
 #loginButton:hover{background:rgba(36,107,206,.75)}
 #registerButton{background:rgba(123,63,198,.45);margin-top:10px}
 #registerButton:hover{background:rgba(123,63,198,.65)}
 #loginButton:active,#registerButton:active{transform:scale(.98)}
 #authMessage{min-height:22px;margin-top:15px;color:#ff7777;font-size:14px;line-height:1.4}
-#backToLogin{display:none;width:100%;margin-top:10px;padding:11px;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:white;background:rgba(255,255,255,.08);cursor:pointer}
+#backToLogin{display:none;width:100%;margin-top:10px;padding:11px;border:1px solid rgba(255,255,255,.15);border-radius:8px;color:#fff;background:rgba(255,255,255,.08);cursor:pointer}
 #game{display:none;width:100%;height:100%}
 #gameArea{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92vw;height:88vh;display:flex;justify-content:center;align-items:center}
 #cubes{display:grid;justify-content:center;align-content:center;gap:10px}
 .cube{position:relative;width:100%;aspect-ratio:1/1;background:#000;overflow:hidden}
 canvas{display:block;width:100%;height:100%}
-.percentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:white;font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none;z-index:10;display:none}
-#playerStats{position:fixed;top:15px;left:15px;z-index:150;color:white;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:12px 15px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
-#playerStatsName{font-size:18px;font-weight:bold;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
-.statLine{font-size:14px;margin-top:4px;color:rgba(255,255,255,.8)}
-#bestPercentageStat{font-weight:bold}
+.percentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none;z-index:10;display:none}
 #controls{position:fixed;left:20px;bottom:20px;display:flex;flex-direction:column;gap:8px;z-index:100}
-#fastMode{display:flex;align-items:center;gap:8px;color:white;font-size:16px;font-weight:bold;cursor:pointer;user-select:none;margin-bottom:2px}
+#fastMode{display:flex;align-items:center;gap:8px;color:#fff;font-size:16px;font-weight:bold;cursor:pointer;user-select:none;margin-bottom:2px}
 #fastMode input{width:18px;height:18px;margin:0;cursor:pointer}
-button{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:12px 18px;font-size:16px;font-weight:bold;color:white;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;transition:.2s}
+button{border:1px solid rgba(255,255,255,.18);border-radius:8px;padding:12px 18px;font-size:16px;font-weight:bold;color:#fff;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);cursor:pointer;transition:.2s}
 button:hover{border-color:rgba(255,255,255,.28)}
 button:active{transform:scale(.98)}
 button:disabled{opacity:.4;cursor:default}
@@ -46,29 +41,43 @@ button:disabled{opacity:.4;cursor:default}
 #removeCube:hover{background:rgba(181,43,43,.48)}
 #restart{background:rgba(68,68,68,.35)}
 #restart:hover{background:rgba(68,68,68,.48)}
-#percentageButton{background:rgba(123,63,198,.35);display:none}
-#percentageButton:hover{background:rgba(123,63,198,.48)}
 #leaderboardButton{background:rgba(46,139,87,.35)}
 #leaderboardButton:hover{background:rgba(46,139,87,.48)}
+#logoutButton{position:fixed;top:15px;right:15px;z-index:200;padding:9px 14px;font-size:14px;background:rgba(181,43,43,.35)}
+#logoutButton:hover{background:rgba(181,43,43,.55)}
+#playerStats{position:fixed;top:15px;left:15px;z-index:150;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:12px;padding:12px 15px;min-width:190px;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+#playerStatsName{font-size:18px;font-weight:bold;margin-bottom:7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px}
+.statLine{font-size:14px;margin-top:4px;color:rgba(255,255,255,.8)}
+#bestPercentageStat{font-weight:bold}
+#unlockInfo{position:fixed;right:20px;bottom:20px;z-index:150;color:#fff;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-radius:10px;padding:10px 14px;font-size:14px;text-align:right}
+#adminPanel{display:none;position:fixed;right:20px;top:65px;z-index:300;width:270px;padding:16px;border-radius:12px;background:rgba(20,20,20,.9);border:1px solid rgba(255,255,255,.2);box-shadow:0 10px 40px rgba(0,0,0,.5);color:#fff}
+#adminPanelTitle{font-size:18px;font-weight:bold;margin-bottom:12px}
+#adminCubeInput{width:100%;height:42px;padding:0 10px;border-radius:7px;border:1px solid rgba(255,255,255,.2);background:rgba(0,0,0,.5);color:#fff;font-size:16px;margin-bottom:8px}
+#adminSaveButton{width:100%;background:rgba(46,139,87,.45)}
+#adminResetButton{width:100%;margin-top:7px;background:rgba(181,43,43,.35)}
+#adminMessage{font-size:13px;color:rgba(255,255,255,.7);margin-top:8px;min-height:18px}
 #leaderboardScreen{position:fixed;inset:0;background:#111;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:900;padding:20px}
-#leaderboardTitle{color:white;font-size:clamp(24px,4vw,40px);font-weight:bold;margin-bottom:40px}
+#leaderboardTitle{color:#fff;font-size:clamp(24px,4vw,40px);font-weight:bold;margin-bottom:20px}
+#leaderboardTabs{display:flex;gap:8px;margin-bottom:30px;flex-wrap:wrap;justify-content:center}
+.lbTab{padding:10px 20px;background:rgba(255,255,255,.1)}
+.lbTab.active{background:rgba(123,63,198,.5)}
 #podium{display:flex;gap:40px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
 .lbSlot{display:flex;flex-direction:column;align-items:center;width:min(26vw,240px);min-width:150px}
 .lbRank{font-size:clamp(28px,5vw,52px);font-weight:bold;margin-bottom:12px;text-shadow:0 2px 6px rgba(0,0,0,.8)}
 .lbCubeWrap{position:relative;width:100%;aspect-ratio:1/1;background:#000;overflow:hidden}
 .lbCubeWrap canvas{display:block;width:100%;height:100%}
 .lbPercentage{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:clamp(18px,4vw,42px);font-weight:bold;text-shadow:0 2px 4px rgba(0,0,0,.9),0 0 8px rgba(0,0,0,.9);pointer-events:none}
-.lbName{margin-top:12px;color:white;font-size:clamp(14px,2vw,20px);font-weight:bold;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbName{margin-top:12px;color:#fff;font-size:clamp(14px,2vw,20px);font-weight:bold;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #leaderboardMessage{min-height:22px;margin-top:25px;color:rgba(255,255,255,.6);font-size:15px}
 #leaderboardBack{margin-top:10px;background:rgba(68,68,68,.35)}
 #leaderboardBack:hover{background:rgba(68,68,68,.48)}
-#logoutButton{position:fixed;top:15px;right:15px;z-index:200;padding:9px 14px;font-size:14px;background:rgba(181,43,43,.35)}
-#logoutButton:hover{background:rgba(181,43,43,.55)}
 @media(max-width:600px){
 #playerStats{min-width:155px;padding:9px 11px}
 #playerStatsName{font-size:16px}
 .statLine{font-size:12px}
 #controls{left:10px;bottom:10px}
+#unlockInfo{right:10px;bottom:10px;font-size:12px;max-width:180px}
+#adminPanel{right:10px;top:60px;width:240px}
 button{padding:10px 13px;font-size:14px}
 }
 </style>
@@ -91,7 +100,15 @@ button{padding:10px 13px;font-size:14px}
 <div id="playerStatsName">Игрок</div>
 <div class="statLine">Лучший процент: <span id="bestPercentageStat">0%</span></div>
 <div class="statLine">Время игры: <span id="playTimeStat">0с</span></div>
-<div class="statLine">Кубов пройдено: <span id="cubesCompletedStat">0</span></div>
+<div class="statLine">Открытые кубы: <span id="cubesCompletedStat">0</span></div>
+</div>
+<div id="unlockInfo"></div>
+<div id="adminPanel">
+<div id="adminPanelTitle">⚙ Панель updatetest</div>
+<input id="adminCubeInput" type="number" min="0" placeholder="Количество открытых кубов">
+<button id="adminSaveButton">Сохранить количество</button>
+<button id="adminResetButton">Установить 0</button>
+<div id="adminMessage"></div>
 </div>
 <div id="gameArea">
 <div id="cubes"></div>
@@ -99,22 +116,38 @@ button{padding:10px 13px;font-size:14px}
 <button id="logoutButton">Выйти</button>
 <div id="controls">
 <label id="fastMode">
-<input type="checkbox" id="fastModeCheckbox">
+<input type="checkbox" id="fastModeCheckbox" disabled>
 <span>Быстрый режим</span>
 </label>
-<button id="addCube">Добавить куб 1/21</button>
-<button id="removeCube" style="display:none;">Убрать куб</button>
+<button id="addCube">Добавить куб 1/1</button>
+<button id="removeCube" style="display:none">Убрать куб</button>
 <button id="restart">Заново</button>
-<button id="percentageButton">Посмотреть проценты до идеала</button>
-<button id="leaderboardButton">Таблица лидеров</button>
+<button id="leaderboardButton">Таблицы лидеров</button>
 </div>
 </div>
 <div id="leaderboardScreen">
 <div id="leaderboardTitle">Таблица лидеров</div>
+<div id="leaderboardTabs">
+<button class="lbTab active" data-mode="percentage">Проценты</button>
+<button class="lbTab" data-mode="time">Время</button>
+<button class="lbTab" data-mode="cubes">Кубы</button>
+</div>
 <div id="podium">
-<div class="lbSlot" id="slot0"><div class="lbRank" style="color:#ffd700">1</div><div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div><div class="lbName">—</div></div>
-<div class="lbSlot" id="slot1"><div class="lbRank" style="color:#c0c0c0">2</div><div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div><div class="lbName">—</div></div>
-<div class="lbSlot" id="slot2"><div class="lbRank" style="color:#cd7f32">3</div><div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div><div class="lbName">—</div></div>
+<div class="lbSlot" id="slot0">
+<div class="lbRank" style="color:#ffd700">1</div>
+<div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
+<div class="lbName">—</div>
+</div>
+<div class="lbSlot" id="slot1">
+<div class="lbRank" style="color:#c0c0c0">2</div>
+<div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
+<div class="lbName">—</div>
+</div>
+<div class="lbSlot" id="slot2">
+<div class="lbRank" style="color:#cd7f32">3</div>
+<div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
+<div class="lbName">—</div>
+</div>
 </div>
 <div id="leaderboardMessage"></div>
 <button id="leaderboardBack">Назад</button>
@@ -123,6 +156,7 @@ button{padding:10px 13px;font-size:14px}
 const SUPABASE_URL="https://htooxiwcryzjopbnitef.supabase.co";
 const SUPABASE_ANON_KEY="sb_publishable_EvgpU14PTHkWQRUfr6f9RQ_lOVMrN9B";
 const supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
 const authScreen=document.getElementById("authScreen");
 const game=document.getElementById("game");
 const usernameInput=document.getElementById("usernameInput");
@@ -137,80 +171,44 @@ const playerStatsName=document.getElementById("playerStatsName");
 const bestPercentageStat=document.getElementById("bestPercentageStat");
 const playTimeStat=document.getElementById("playTimeStat");
 const cubesCompletedStat=document.getElementById("cubesCompletedStat");
+const unlockInfo=document.getElementById("unlockInfo");
+const adminPanel=document.getElementById("adminPanel");
+const adminCubeInput=document.getElementById("adminCubeInput");
+const adminSaveButton=document.getElementById("adminSaveButton");
+const adminResetButton=document.getElementById("adminResetButton");
+const adminMessage=document.getElementById("adminMessage");
+
 let registrationMode=false;
 let currentUser=null;
-let stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0};
+let stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
 let playTimer=null;
 let lastPlaySave=Date.now();
+let savingStats=false;
+
+const MAX_CUBES=21;
+const LINE_COUNT=80;
+const FILL_TIME=3000;
+const GAP=10;
+
+const UNLOCKS=[0,0,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000,2500000,5000000,10000000,25000000];
+
+const cubesContainer=document.getElementById("cubes");
+const addButton=document.getElementById("addCube");
+const removeButton=document.getElementById("removeCube");
+const restartButton=document.getElementById("restart");
+const fastModeCheckbox=document.getElementById("fastModeCheckbox");
+
+let cubes=[];
+let addingCube=false;
+
 function showAuthMessage(message){authMessage.textContent=message}
+
 function isValidUsername(username){return /^[a-zA-Z0-9_]{3,30}$/.test(username)}
+
 function usernameToEmail(username){return username.trim().toLowerCase()+"@rcfcg-game.com"}
-function showGame(){authScreen.style.display="none";game.style.display="block";startPlayTimer();requestAnimationFrame(()=>updateLayout())}
-function showAuth(){stopPlayTimer();game.style.display="none";authScreen.style.display="flex"}
-function enterRegistrationMode(){registrationMode=true;document.getElementById("authTitle").textContent="Регистрация";loginButton.style.display="none";registerText.style.display="none";registerButton.textContent="Создать аккаунт";backToLogin.style.display="block";passwordInput.value="";showAuthMessage("")}
-backToLogin.addEventListener("click",()=>{registrationMode=false;document.getElementById("authTitle").textContent="RCFCG";loginButton.style.display="block";registerText.style.display="block";registerButton.textContent="Зарегистрироваться";backToLogin.style.display="none";showAuthMessage("")});
-registerButton.addEventListener("click",async()=>{
-if(!registrationMode){enterRegistrationMode();return}
-const username=usernameInput.value.trim().toLowerCase();
-const password=passwordInput.value;
-if(!isValidUsername(username)){showAuthMessage("Логин: 3–30 символов. Используй только латинские буквы, цифры и _.");return}
-if(password.length<6){showAuthMessage("Пароль должен содержать минимум 6 символов.");return}
-registerButton.disabled=true;
-showAuthMessage("Создание аккаунта...");
-const {data,error}=await supabaseClient.auth.signUp({email:usernameToEmail(username),password:password,options:{data:{username:username}}});
-registerButton.disabled=false;
-if(error){showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);return}
-if(data.session){showAuthMessage("");await loadPlayerStats(data.user);showGame();return}
-showAuthMessage("Аккаунт создан. Проверь настройки Confirm email в Supabase.");
-registrationMode=false;
-document.getElementById("authTitle").textContent="RCFCG";
-loginButton.style.display="block";
-registerText.style.display="block";
-registerButton.textContent="Зарегистрироваться";
-backToLogin.style.display="none";
-});
-loginButton.addEventListener("click",async()=>{
-const username=usernameInput.value.trim().toLowerCase();
-const password=passwordInput.value;
-if(!username){showAuthMessage("Введите логин.");return}
-if(!password){showAuthMessage("Введите пароль.");return}
-if(!isValidUsername(username)){showAuthMessage("Неверный логин.");return}
-loginButton.disabled=true;
-showAuthMessage("Выполняется вход...");
-const {data,error}=await supabaseClient.auth.signInWithPassword({email:usernameToEmail(username),password:password});
-loginButton.disabled=false;
-if(error){showAuthMessage("Неверный логин или пароль.");return}
-currentUser=data.user;
-await loadPlayerStats(currentUser);
-showAuthMessage("");
-showGame();
-});
-usernameInput.addEventListener("keydown",event=>{if(event.key==="Enter")passwordInput.focus()});
-passwordInput.addEventListener("keydown",event=>{if(event.key==="Enter")registrationMode?registerButton.click():loginButton.click()});
-logoutButton.addEventListener("click",async()=>{await savePlayerStats();stopPlayTimer();await supabaseClient.auth.signOut();currentUser=null;showAuth();usernameInput.value="";passwordInput.value="";registrationMode=false;document.getElementById("authTitle").textContent="RCFCG";loginButton.style.display="block";registerText.style.display="block";registerButton.textContent="Зарегистрироваться";backToLogin.style.display="none";showAuthMessage("")});
-async function checkSession(){const {data}=await supabaseClient.auth.getSession();if(data.session){currentUser=data.session.user;await loadPlayerStats(currentUser);showGame()}else showAuth()}
-async function loadPlayerStats(user){
-if(!user)return;
-const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed").eq("user_id",user.id).maybeSingle();
-if(error){console.error("Stats load:",error);return}
-if(data){
-stats.bestPercentage=Number(data.best_percentage||0);
-stats.dominantColor=data.dominant_color||"white";
-stats.totalPlaySeconds=Number(data.total_play_seconds||0);
-stats.cubesCompleted=Number(data.cubes_completed||0);
-}else{
-stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0};
-}
-updateStatsUI()
-}
-function updateStatsUI(){
-const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
-playerStatsName.textContent=username;
-bestPercentageStat.textContent=stats.bestPercentage+"%";
-bestPercentageStat.style.color=stats.dominantColor;
-playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
-cubesCompletedStat.textContent=stats.cubesCompleted;
-}
+
+function isAdmin(){return currentUser?.user_metadata?.username?.toLowerCase()==="updatetest"}
+
 function formatTime(seconds){
 seconds=Math.floor(seconds);
 const days=Math.floor(seconds/86400);
@@ -224,6 +222,83 @@ if(hours>0)return `${hours}ч ${minutes}м`;
 if(minutes>0)return `${minutes}м ${secs}с`;
 return `${secs}с`;
 }
+
+function getMaxCubes(){
+if(isAdmin())return MAX_CUBES;
+let unlocked=1;
+for(let i=2;i<=MAX_CUBES;i++){
+if(stats.cubesCompleted>=UNLOCKS[i])unlocked=i;
+else break;
+}
+return unlocked;
+}
+
+function updateUnlockInfo(){
+if(isAdmin()){
+unlockInfo.textContent="updatetest: доступны все 21 куб";
+return;
+}
+const max=getMaxCubes();
+if(max>=MAX_CUBES){
+unlockInfo.textContent="Открыты все 21 куб";
+return;
+}
+const next=max+1;
+const missing=Math.max(0,UNLOCKS[next]-stats.cubesCompleted);
+unlockInfo.textContent=`До открытия ${next}-го куба: ${missing}`;
+}
+
+function updateStatsUI(){
+const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
+playerStatsName.textContent=username;
+bestPercentageStat.textContent=stats.bestPercentage+"%";
+bestPercentageStat.style.color=stats.dominantColor||"white";
+playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
+cubesCompletedStat.textContent=stats.cubesCompleted;
+updateUnlockInfo();
+updateButtons();
+}
+
+async function loadPlayerStats(user){
+if(!user)return;
+const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors").eq("user_id",user.id).maybeSingle();
+if(error){
+console.error("Stats load:",error);
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
+updateStatsUI();
+return;
+}
+if(data){
+stats.bestPercentage=Number(data.best_percentage||0);
+stats.dominantColor=data.dominant_color||"white";
+stats.totalPlaySeconds=Number(data.total_play_seconds||0);
+stats.cubesCompleted=Number(data.cubes_completed||0);
+stats.bestColors=Array.isArray(data.colors)?data.colors:[];
+}else{
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
+await savePlayerStats();
+}
+updateStatsUI();
+}
+
+async function savePlayerStats(){
+if(!currentUser||savingStats)return;
+savingStats=true;
+const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
+const payload={
+user_id:currentUser.id,
+username:username,
+best_percentage:Number(stats.bestPercentage)||0,
+dominant_color:stats.dominantColor||"white",
+total_play_seconds:Number(stats.totalPlaySeconds)||0,
+cubes_completed:Number(stats.cubesCompleted)||0,
+colors:Array.isArray(stats.bestColors)?stats.bestColors:[]
+};
+const {error}=await supabaseClient.from("leaderboard").upsert(payload,{onConflict:"user_id"});
+if(error)console.error("Stats save:",error);
+savingStats=false;
+}
+
 function startPlayTimer(){
 if(playTimer||!currentUser)return;
 lastPlaySave=Date.now();
@@ -236,37 +311,201 @@ lastPlaySave=now;
 updateStatsUI();
 if(stats.totalPlaySeconds%10<delta)await savePlayerStats();
 }
-},1000)
+},1000);
 }
-function stopPlayTimer(){if(playTimer){clearInterval(playTimer);playTimer=null}}
-async function savePlayerStats(){
-if(!currentUser)return;
-const username=currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Игрок";
-const {error}=await supabaseClient.from("leaderboard").upsert({user_id:currentUser.id,username:username,best_percentage:stats.bestPercentage,dominant_color:stats.dominantColor,total_play_seconds:stats.totalPlaySeconds,cubes_completed:stats.cubesCompleted},{onConflict:"user_id"});
-if(error)console.error("Stats save:",error)
+
+async function stopPlayTimer(){
+if(playTimer){
+const now=Date.now();
+const delta=Math.floor((now-lastPlaySave)/1000);
+if(delta>0){
+stats.totalPlaySeconds+=delta;
+lastPlaySave=now;
+updateStatsUI();
 }
-const MAX_CUBES=21;
-const LINE_COUNT=80;
-const FILL_TIME=3000;
-const GAP=10;
-const cubesContainer=document.getElementById("cubes");
-const addButton=document.getElementById("addCube");
-const removeButton=document.getElementById("removeCube");
-const restartButton=document.getElementById("restart");
-const percentageButton=document.getElementById("percentageButton");
-const fastModeCheckbox=document.getElementById("fastModeCheckbox");
-let cubes=[];
+clearInterval(playTimer);
+playTimer=null;
+}
+await savePlayerStats();
+}
+
+function showGame(){
+authScreen.style.display="none";
+game.style.display="block";
+adminPanel.style.display=isAdmin()?"block":"none";
+if(isAdmin()){
+adminCubeInput.value=stats.cubesCompleted;
+adminMessage.textContent="";
+}
+updateStatsUI();
+startPlayTimer();
+requestAnimationFrame(updateLayout);
+}
+
+function showAuth(){
+game.style.display="none";
+authScreen.style.display="flex";
+adminPanel.style.display="none";
+}
+
+function enterRegistrationMode(){
+registrationMode=true;
+document.getElementById("authTitle").textContent="Регистрация";
+loginButton.style.display="none";
+registerText.style.display="none";
+registerButton.textContent="Создать аккаунт";
+backToLogin.style.display="block";
+passwordInput.value="";
+showAuthMessage("");
+}
+
+backToLogin.addEventListener("click",()=>{
+registrationMode=false;
+document.getElementById("authTitle").textContent="RCFCG";
+loginButton.style.display="block";
+registerText.style.display="block";
+registerButton.textContent="Зарегистрироваться";
+backToLogin.style.display="none";
+showAuthMessage("");
+});
+
+registerButton.addEventListener("click",async()=>{
+if(!registrationMode){
+enterRegistrationMode();
+return;
+}
+const username=usernameInput.value.trim().toLowerCase();
+const password=passwordInput.value;
+if(!isValidUsername(username)){
+showAuthMessage("Логин: 3–30 символов. Используй только латинские буквы, цифры и _.");
+return;
+}
+if(password.length<6){
+showAuthMessage("Пароль должен содержать минимум 6 символов.");
+return;
+}
+registerButton.disabled=true;
+showAuthMessage("Создание аккаунта...");
+const {data,error}=await supabaseClient.auth.signUp({
+email:usernameToEmail(username),
+password:password,
+options:{data:{username:username}}
+});
+registerButton.disabled=false;
+if(error){
+showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);
+return;
+}
+if(data.session){
+currentUser=data.user;
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
+await savePlayerStats();
+showAuthMessage("");
+showGame();
+return;
+}
+showAuthMessage("Аккаунт создан. Проверь настройки Confirm email в Supabase.");
+registrationMode=false;
+document.getElementById("authTitle").textContent="RCFCG";
+loginButton.style.display="block";
+registerText.style.display="block";
+registerButton.textContent="Зарегистрироваться";
+backToLogin.style.display="none";
+});
+
+loginButton.addEventListener("click",async()=>{
+const username=usernameInput.value.trim().toLowerCase();
+const password=passwordInput.value;
+if(!username){
+showAuthMessage("Введите логин.");
+return;
+}
+if(!password){
+showAuthMessage("Введите пароль.");
+return;
+}
+if(!isValidUsername(username)){
+showAuthMessage("Неверный логин.");
+return;
+}
+loginButton.disabled=true;
+showAuthMessage("Выполняется вход...");
+const {data,error}=await supabaseClient.auth.signInWithPassword({
+email:usernameToEmail(username),
+password:password
+});
+loginButton.disabled=false;
+if(error){
+showAuthMessage("Неверный логин или пароль.");
+return;
+}
+currentUser=data.user;
+await loadPlayerStats(currentUser);
+showAuthMessage("");
+showGame();
+});
+
+usernameInput.addEventListener("keydown",event=>{
+if(event.key==="Enter")passwordInput.focus();
+});
+
+passwordInput.addEventListener("keydown",event=>{
+if(event.key==="Enter"){
+registrationMode?registerButton.click():loginButton.click();
+}
+});
+
+logoutButton.addEventListener("click",async()=>{
+await stopPlayTimer();
+await supabaseClient.auth.signOut();
+currentUser=null;
+showAuth();
+usernameInput.value="";
+passwordInput.value="";
+registrationMode=false;
+document.getElementById("authTitle").textContent="RCFCG";
+loginButton.style.display="block";
+registerText.style.display="block";
+registerButton.textContent="Зарегистрироваться";
+backToLogin.style.display="none";
+showAuthMessage("");
+});
+
+adminSaveButton.addEventListener("click",async()=>{
+if(!isAdmin())return;
+let value=Math.floor(Number(adminCubeInput.value));
+if(!Number.isFinite(value)||value<0)value=0;
+if(value>25000000)value=25000000;
+stats.cubesCompleted=value;
+adminCubeInput.value=value;
+updateStatsUI();
+adminMessage.textContent="Сохранение...";
+await savePlayerStats();
+adminMessage.textContent=`Сохранено: ${value} открытых кубов`;
+});
+
+adminResetButton.addEventListener("click",async()=>{
+if(!isAdmin())return;
+stats.cubesCompleted=0;
+adminCubeInput.value=0;
+updateStatsUI();
+await savePlayerStats();
+adminMessage.textContent="Установлено 0";
+});
+
 function randomColor(){
 const hue=Math.floor(Math.random()*360);
 const saturation=75+Math.random()*25;
 const lightness=50+Math.random()*20;
-return{css:`hsl(${hue},${saturation}%,${lightness}%)`,hue:hue}
+return{css:`hsl(${hue},${saturation}%,${lightness}%)`,hue:hue};
 }
+
 function generateColors(){
 const colors=[];
 for(let i=0;i<LINE_COUNT;i++)colors.push(randomColor());
-return colors
+return colors;
 }
+
 function createCube(){
 const cube=document.createElement("div");
 cube.className="cube";
@@ -277,19 +516,30 @@ percentage.className="percentage";
 percentage.textContent="0%";
 cube.appendChild(percentage);
 cubesContainer.appendChild(cube);
-const data={element:cube,canvas:canvas,percentage:percentage,colors:generateColors(),progress:0,animation:null,showPercentage:false,counted:false};
+const data={
+element:cube,
+canvas:canvas,
+percentage:percentage,
+colors:generateColors(),
+progress:0,
+animation:null,
+showPercentage:false,
+counted:false
+};
 cubes.push(data);
 resizeCube(data);
-return data
+return data;
 }
+
 function resizeCube(data){
 const rect=data.element.getBoundingClientRect();
 if(rect.width<=0||rect.height<=0)return;
 const size=Math.floor(Math.min(rect.width,rect.height));
 data.canvas.width=size;
 data.canvas.height=size;
-drawCube(data,data.progress)
+drawCube(data,data.progress);
 }
+
 function drawCube(data,progress){
 const canvas=data.canvas;
 const ctx=canvas.getContext("2d");
@@ -298,6 +548,7 @@ if(size<=0)return;
 ctx.clearRect(0,0,size,size);
 const center=size/2;
 const lineHeight=size/LINE_COUNT;
+
 ctx.save();
 ctx.beginPath();
 ctx.moveTo(0,0);
@@ -309,9 +560,10 @@ for(let i=0;i<LINE_COUNT;i++){
 const y=i*lineHeight;
 const maxX=center*(1-Math.abs(y+lineHeight/2-center)/center);
 ctx.fillStyle=data.colors[i].css;
-ctx.fillRect(0,y,maxX*progress,lineHeight+1)
+ctx.fillRect(0,y,maxX*progress,lineHeight+1);
 }
 ctx.restore();
+
 ctx.save();
 ctx.beginPath();
 ctx.moveTo(size,0);
@@ -324,9 +576,10 @@ const y=i*lineHeight;
 const maxX=center*(1-Math.abs(y+lineHeight/2-center)/center);
 const currentX=maxX*progress;
 ctx.fillStyle=data.colors[(i+20)%LINE_COUNT].css;
-ctx.fillRect(size-currentX,y,currentX,lineHeight+1)
+ctx.fillRect(size-currentX,y,currentX,lineHeight+1);
 }
 ctx.restore();
+
 ctx.save();
 ctx.beginPath();
 ctx.moveTo(0,0);
@@ -339,9 +592,10 @@ for(let i=0;i<LINE_COUNT;i++){
 const x=i*lineWidth;
 const maxY=center*(1-Math.abs(x+lineWidth/2-center)/center);
 ctx.fillStyle=data.colors[(i+40)%LINE_COUNT].css;
-ctx.fillRect(x,0,lineWidth+1,maxY*progress)
+ctx.fillRect(x,0,lineWidth+1,maxY*progress);
 }
 ctx.restore();
+
 ctx.save();
 ctx.beginPath();
 ctx.moveTo(0,size);
@@ -354,30 +608,30 @@ const x=i*lineWidth;
 const maxY=center*(1-Math.abs(x+lineWidth/2-center)/center);
 const currentY=maxY*progress;
 ctx.fillStyle=data.colors[(i+60)%LINE_COUNT].css;
-ctx.fillRect(x,size-currentY,lineWidth+1,currentY)
+ctx.fillRect(x,size-currentY,lineWidth+1,currentY);
 }
 ctx.restore();
+
 if(progress>=1){
 ctx.fillStyle="#fff";
 ctx.beginPath();
 ctx.arc(center,center,2,0,Math.PI*2);
-ctx.fill()
+ctx.fill();
 }
 }
+
 function animateCube(data){
 data.counted=false;
 if(fastModeCheckbox.checked){
 if(data.animation)cancelAnimationFrame(data.animation);
 data.progress=0;
 drawCube(data,0);
-data.animation=requestAnimationFrame(()=>{
+requestAnimationFrame(()=>{
 data.progress=1;
 drawCube(data,1);
-data.animation=null;
 completeCube(data);
-checkAllCubesFilled()
 });
-return
+return;
 }
 if(data.animation)cancelAnimationFrame(data.animation);
 const start=performance.now();
@@ -385,29 +639,17 @@ function frame(now){
 const elapsed=now-start;
 data.progress=Math.min(elapsed/FILL_TIME,1);
 drawCube(data,data.progress);
-if(data.progress<1)data.animation=requestAnimationFrame(frame);
-else{
+if(data.progress<1){
+data.animation=requestAnimationFrame(frame);
+}else{
 data.animation=null;
 completeCube(data);
-checkAllCubesFilled()
 }
 }
 data.progress=0;
-data.animation=requestAnimationFrame(frame)
+data.animation=requestAnimationFrame(frame);
 }
-function completeCube(data){
-if(data.counted)return;
-if(data.progress<1)return;
-data.counted=true;
-stats.cubesCompleted++;
-updateStatsUI();
-savePlayerStats()
-}
-function checkAllCubesFilled(){
-if(cubes.length===0){percentageButton.style.display="none";return}
-const allFilled=cubes.every(cube=>cube.progress>=1);
-percentageButton.style.display=allFilled?"block":"none"
-}
+
 function getDominantColor(data){
 const groups=[];
 data.colors.forEach(color=>{
@@ -415,34 +657,48 @@ let found=null;
 for(const group of groups){
 let difference=Math.abs(color.hue-group.hue);
 difference=Math.min(difference,360-difference);
-if(difference<=5){found=group;break}
+if(difference<=5){
+found=group;
+break;
 }
-if(found)found.count++;
-else groups.push({hue:color.hue,count:1,css:color.css})
+}
+if(found){
+found.count++;
+}else{
+groups.push({hue:color.hue,count:1,css:color.css});
+}
 });
 groups.sort((a,b)=>b.count-a.count);
-return groups[0]
+return groups[0];
 }
-async function showPercentages(){
-if(!cubes.every(cube=>cube.progress>=1))return;
-let best=null;
-cubes.forEach(cube=>{
-const dominant=getDominantColor(cube);
+
+async function showPercentageAutomatically(data){
+if(!data||data.progress<1)return;
+if(data.showPercentage)return;
+const dominant=getDominantColor(data);
 const percentage=Math.round(dominant.count/LINE_COUNT*100);
-cube.percentage.textContent=percentage+"%";
-cube.percentage.style.color=dominant.css;
-cube.percentage.style.display="block";
-cube.showPercentage=true;
-if(!best||percentage>best.percentage)best={percentage:percentage,dominantCss:dominant.css,colors:cube.colors}
-});
-if(best&&best.percentage>stats.bestPercentage){
-stats.bestPercentage=best.percentage;
-stats.dominantColor=best.dominantCss;
+data.percentage.textContent=percentage+"%";
+data.percentage.style.color=dominant.css;
+data.percentage.style.display="block";
+data.showPercentage=true;
+if(percentage>stats.bestPercentage){
+stats.bestPercentage=percentage;
+stats.dominantColor=dominant.css;
+stats.bestColors=data.colors.map(color=>color.css);
 updateStatsUI();
-await savePlayerStats()
+await savePlayerStats();
 }
-await saveToLeaderboard(best.percentage,best.dominantCss,best.colors)
 }
+
+async function completeCube(data){
+if(data.counted||data.progress<1)return;
+data.counted=true;
+stats.cubesCompleted++;
+updateStatsUI();
+await showPercentageAutomatically(data);
+await savePlayerStats();
+}
+
 function updateLayout(){
 const count=cubes.length;
 if(!count)return;
@@ -452,48 +708,74 @@ const areaHeight=gameArea.clientHeight;
 let bestColumns=1;
 let bestRows=count;
 let bestSize=0;
+
 for(let columns=1;columns<=count;columns++){
 const rows=Math.ceil(count/columns);
 const width=(areaWidth-GAP*(columns-1))/columns;
 const height=(areaHeight-GAP*(rows-1))/rows;
 const size=Math.floor(Math.min(width,height));
-if(size>bestSize){bestSize=size;bestColumns=columns;bestRows=rows}
+if(size>bestSize){
+bestSize=size;
+bestColumns=columns;
+bestRows=rows;
 }
+}
+
 cubesContainer.style.gridTemplateColumns=`repeat(${bestColumns},${bestSize}px)`;
 cubesContainer.style.gridTemplateRows=`repeat(${bestRows},${bestSize}px)`;
-cubes.forEach(resizeCube)
+cubes.forEach(resizeCube);
 }
+
 function updateButtons(){
 const count=cubes.length;
-if(count<MAX_CUBES){
-addButton.textContent=`Добавить куб ${count}/21`;
-addButton.disabled=false
-}else{
-addButton.textContent="Добавить куб 21/21";
-addButton.disabled=true
-}
+const maxAllowed=getMaxCubes();
+addButton.textContent=`Добавить куб ${count}/${maxAllowed}`;
+addButton.disabled=addingCube||count>=maxAllowed;
 removeButton.style.display=count>=2?"block":"none";
-fastModeCheckbox.disabled=false;
+fastModeCheckbox.disabled=count<10;
+if(count<10){
+fastModeCheckbox.checked=false;
+fastModeCheckbox.title="Быстрый режим откроется на 10 кубах";
+}else{
+fastModeCheckbox.title="";
 }
+}
+
 addButton.addEventListener("click",()=>{
-if(cubes.length>=MAX_CUBES)return;
-percentageButton.style.display="none";
+if(addingCube)return;
+const maxAllowed=getMaxCubes();
+if(cubes.length>=maxAllowed){
+updateButtons();
+return;
+}
+if(cubes.length>=MAX_CUBES){
+updateButtons();
+return;
+}
+addingCube=true;
+updateButtons();
 const cube=createCube();
 updateLayout();
-updateButtons();
-requestAnimationFrame(()=>{resizeCube(cube);animateCube(cube)})
+requestAnimationFrame(()=>{
+resizeCube(cube);
+animateCube(cube);
 });
+setTimeout(()=>{
+addingCube=false;
+updateButtons();
+},250);
+});
+
 removeButton.addEventListener("click",()=>{
 if(cubes.length<=1)return;
-percentageButton.style.display="none";
 const removed=cubes.pop();
 if(removed.animation)cancelAnimationFrame(removed.animation);
 removed.element.remove();
 updateLayout();
-updateButtons()
+updateButtons();
 });
+
 restartButton.addEventListener("click",()=>{
-percentageButton.style.display="none";
 cubes.forEach(cube=>{
 if(cube.animation)cancelAnimationFrame(cube.animation);
 cube.colors=generateColors();
@@ -503,95 +785,178 @@ cube.percentage.style.display="none";
 cube.percentage.textContent="0%";
 cube.showPercentage=false;
 });
-cubes.forEach(animateCube)
+cubes.forEach(animateCube);
 });
-percentageButton.addEventListener("click",showPercentages);
+
 fastModeCheckbox.addEventListener("change",()=>{
-percentageButton.style.display="none";
+if(cubes.length<10){
+fastModeCheckbox.checked=false;
+return;
+}
 cubes.forEach(cube=>{
 if(cube.animation)cancelAnimationFrame(cube.animation);
-cube.animation=null;
 cube.progress=0;
 cube.counted=false;
-cube.percentage.style.display="none";
-cube.percentage.textContent="0%";
 cube.showPercentage=false;
-animateCube(cube)
-})
+cube.percentage.style.display="none";
+animateCube(cube);
 });
+});
+
 window.addEventListener("resize",updateLayout);
+
 const leaderboardButton=document.getElementById("leaderboardButton");
 const leaderboardScreen=document.getElementById("leaderboardScreen");
 const leaderboardBack=document.getElementById("leaderboardBack");
 const leaderboardMessage=document.getElementById("leaderboardMessage");
-const leaderboardSlots=[document.getElementById("slot0"),document.getElementById("slot1"),document.getElementById("slot2")];
-async function saveToLeaderboard(percentage,dominantCss,colors){
-try{
-const {data:userData}=await supabaseClient.auth.getUser();
-const user=userData.user;
-if(!user)return;
-const username=user.user_metadata?.username||user.email?.split("@")[0]||"Игрок";
-const {data:existing}=await supabaseClient.from("leaderboard").select("best_percentage").eq("user_id",user.id).maybeSingle();
-if(existing&&existing.best_percentage>=percentage)return;
-const {error}=await supabaseClient.from("leaderboard").upsert({
-user_id:user.id,
-username:username,
-best_percentage:percentage,
-dominant_color:dominantCss,
-colors:colors.map(color=>color.css)
+const leaderboardSlots=[
+document.getElementById("slot0"),
+document.getElementById("slot1"),
+document.getElementById("slot2")
+];
+
+let leaderboardMode="percentage";
+
+function clearLeaderboardCubes(){
+leaderboardSlots.forEach(slot=>{
+const canvas=slot.querySelector("canvas");
+const percentageEl=slot.querySelector(".lbPercentage");
+const wrap=slot.querySelector(".lbCubeWrap");
+const ctx=canvas.getContext("2d");
+ctx.clearRect(0,0,canvas.width,canvas.height);
+percentageEl.textContent="";
+wrap.style.display="none";
 });
-if(error)console.error("Leaderboard save:",error)
-}catch(e){console.error("Leaderboard save:",e)}
 }
-function renderLeaderboardSlot(slot,row){
+
+function drawLeaderboardCube(canvas,colors){
+const ctx=canvas.getContext("2d");
+const size=canvas.width;
+ctx.clearRect(0,0,size,size);
+if(!Array.isArray(colors)||colors.length!==LINE_COUNT){
+ctx.fillStyle="#000";
+ctx.fillRect(0,0,size,size);
+return;
+}
+const data={
+canvas:canvas,
+colors:colors.map(css=>({css:css,hue:0}))
+};
+drawCube(data,1);
+}
+
+function renderLeaderboardSlot(slot,row,mode){
 const canvas=slot.querySelector("canvas");
 const percentageEl=slot.querySelector(".lbPercentage");
 const nameEl=slot.querySelector(".lbName");
 const wrap=slot.querySelector(".lbCubeWrap");
-const size=Math.floor(wrap.getBoundingClientRect().width);
+const size=Math.floor(slot.getBoundingClientRect().width);
 canvas.width=size>0?size:200;
 canvas.height=canvas.width;
 const ctx=canvas.getContext("2d");
 ctx.clearRect(0,0,canvas.width,canvas.height);
+nameEl.textContent=row?row.username:"—";
+
 if(!row){
+wrap.style.display=mode==="percentage"?"block":"none";
 percentageEl.textContent="";
-nameEl.textContent="—";
-return
+return;
 }
-const colors=(row.colors||[]).map(css=>({css:css}));
-if(colors.length===LINE_COUNT)drawCube({canvas:canvas,colors:colors},1);
-percentageEl.textContent=row.best_percentage+"%";
+
+if(mode==="percentage"){
+wrap.style.display="block";
+drawLeaderboardCube(canvas,Array.isArray(row.colors)?row.colors:[]);
+percentageEl.textContent=Number(row.best_percentage||0)+"%";
 percentageEl.style.color=row.dominant_color||"white";
-nameEl.textContent=row.username
+}else{
+wrap.style.display="none";
+percentageEl.textContent="";
 }
-leaderboardButton.addEventListener("click",async()=>{
-game.style.display="none";
-leaderboardScreen.style.display="flex";
+
+if(mode==="time"){
+nameEl.textContent=`${row.username} — ${formatTime(row.total_play_seconds)}`;
+}else if(mode==="cubes"){
+nameEl.textContent=`${row.username} — ${row.cubes_completed} кубов`;
+}
+}
+
+async function loadLeaderboard(mode){
+leaderboardMode=mode;
+document.querySelectorAll(".lbTab").forEach(tab=>{
+tab.classList.toggle("active",tab.dataset.mode===mode);
+});
 leaderboardMessage.textContent="Загрузка...";
-const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,colors").order("best_percentage",{ascending:false}).limit(3);
+if(mode!=="percentage")clearLeaderboardCubes();
+
+let query=supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,colors,total_play_seconds,cubes_completed");
+
+if(mode==="percentage")query=query.order("best_percentage",{ascending:false});
+if(mode==="time")query=query.order("total_play_seconds",{ascending:false});
+if(mode==="cubes")query=query.order("cubes_completed",{ascending:false});
+
+const {data,error}=await query.limit(3);
+
 if(error){
 console.error("Leaderboard load:",error);
 leaderboardMessage.textContent="Не удалось загрузить таблицу лидеров.";
-return
+return;
 }
+
 leaderboardMessage.textContent=data.length?"":"Пока нет результатов.";
-requestAnimationFrame(()=>leaderboardSlots.forEach((slot,index)=>renderLeaderboardSlot(slot,data[index]||null)))
+
+requestAnimationFrame(()=>{
+leaderboardSlots.forEach((slot,index)=>{
+renderLeaderboardSlot(slot,data[index]||null,mode);
 });
+});
+}
+
+leaderboardButton.addEventListener("click",async()=>{
+await savePlayerStats();
+game.style.display="none";
+leaderboardScreen.style.display="flex";
+await loadLeaderboard("percentage");
+});
+
+document.querySelectorAll(".lbTab").forEach(tab=>{
+tab.addEventListener("click",async()=>{
+await loadLeaderboard(tab.dataset.mode);
+});
+});
+
 leaderboardBack.addEventListener("click",()=>{
 leaderboardScreen.style.display="none";
 game.style.display="block";
-requestAnimationFrame(updateLayout)
+requestAnimationFrame(updateLayout);
 });
+
 createCube();
 updateLayout();
 updateButtons();
+
 requestAnimationFrame(()=>{
+if(cubes[0]){
 resizeCube(cubes[0]);
-animateCube(cubes[0])
+animateCube(cubes[0]);
+}
 });
-window.addEventListener("beforeunload",()=>{savePlayerStats()});
+
+window.addEventListener("beforeunload",()=>{
+if(currentUser)savePlayerStats();
+});
+
+async function checkSession(){
+const {data}=await supabaseClient.auth.getSession();
+if(data.session){
+currentUser=data.session.user;
+await loadPlayerStats(currentUser);
+showGame();
+}else{
+showAuth();
+}
+}
+
 checkSession();
 </script>
 </body>
 </html>
-```
