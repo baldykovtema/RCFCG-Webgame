@@ -23,6 +23,7 @@ function showGame() {
     }
     updateStatsUI();
     startPlayTimer();
+    startDonutSpawner();
     requestAnimationFrame(updateLayout);
 }
 
@@ -30,6 +31,7 @@ function showAuth() {
     game.style.display = "none";
     authScreen.style.display = "flex";
     adminPanel.style.display = "none";
+    stopDonutSpawner();
 }
 
 function enterRegistrationMode() {

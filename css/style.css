@@ -326,6 +326,57 @@ button:disabled {
     text-align: right
 }
 
+#donut {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 500;
+    font-size: 80px;
+    cursor: pointer;
+    user-select: none;
+    display: none;
+    animation: donutFloat 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 200, 100, .8));
+    transition: transform .15s
+}
+
+#donut:hover {
+    transform: translate(-50%, -50%) scale(1.15)
+}
+
+#donut:active {
+    transform: translate(-50%, -50%) scale(.9)
+}
+
+@keyframes donutFloat {
+    0%,
+    100% {
+        margin-top: 0
+    }
+
+    50% {
+        margin-top: -15px
+    }
+}
+
+#donutBoostInfo {
+    position: fixed;
+    left: 50%;
+    top: 15px;
+    transform: translateX(-50%);
+    z-index: 500;
+    color: #ffd700;
+    font-size: 18px;
+    font-weight: bold;
+    background: rgba(0, 0, 0, .6);
+    border: 1px solid rgba(255, 215, 0, .4);
+    border-radius: 10px;
+    padding: 8px 16px;
+    display: none;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, .8)
+}
+
 #adminPanel {
     display: none;
     position: fixed;

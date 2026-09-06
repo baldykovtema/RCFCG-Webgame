@@ -7,3 +7,5 @@ let savingStats = false;
 
 let cubes = [];
 let addingCube = false;
+
+let donutBoostActive = false;

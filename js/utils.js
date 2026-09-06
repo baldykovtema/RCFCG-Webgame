@@ -29,6 +29,21 @@ function randomColor() {
 
 function generateColors() {
     const colors = [];
+    if (donutBoostActive) {
+        // Бонус пончика: 20% цветов одного оттенка → шанс большого процента x2.5
+        const dominantHue = Math.floor(Math.random() * 360);
+        const dominantCount = Math.floor(LINE_COUNT * 0.2);
+        for (let i = 0; i < LINE_COUNT; i++) {
+            if (i < dominantCount) {
+                const saturation = 75 + Math.random() * 25;
+                const lightness = 50 + Math.random() * 20;
+                colors.push({ css: `hsl(${dominantHue},${saturation}%,${lightness}%)`, hue: dominantHue });
+            } else {
+                colors.push(randomColor());
+            }
+        }
+        return colors;
+    }
     for (let i = 0; i < LINE_COUNT; i++) colors.push(randomColor());
     return colors;
 }
