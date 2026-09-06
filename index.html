@@ -119,7 +119,7 @@ button{padding:10px 13px;font-size:14px}
 <input type="checkbox" id="fastModeCheckbox" disabled>
 <span>Быстрый режим</span>
 </label>
-<button id="addCube">Добавить куб 1/21</button>
+<button id="addCube">Добавить куб 1/1</button>
 <button id="removeCube" style="display:none">Убрать куб</button>
 <button id="restart">Заново</button>
 <button id="leaderboardButton">Таблицы лидеров</button>
@@ -135,26 +135,17 @@ button{padding:10px 13px;font-size:14px}
 <div id="podium">
 <div class="lbSlot" id="slot0">
 <div class="lbRank" style="color:#ffd700">1</div>
-<div class="lbCubeWrap">
-<canvas></canvas>
-<div class="lbPercentage"></div>
-</div>
+<div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
 <div class="lbName">—</div>
 </div>
 <div class="lbSlot" id="slot1">
 <div class="lbRank" style="color:#c0c0c0">2</div>
-<div class="lbCubeWrap">
-<canvas></canvas>
-<div class="lbPercentage"></div>
-</div>
+<div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
 <div class="lbName">—</div>
 </div>
 <div class="lbSlot" id="slot2">
 <div class="lbRank" style="color:#cd7f32">3</div>
-<div class="lbCubeWrap">
-<canvas></canvas>
-<div class="lbPercentage"></div>
-</div>
+<div class="lbCubeWrap"><canvas></canvas><div class="lbPercentage"></div></div>
 <div class="lbName">—</div>
 </div>
 </div>
@@ -189,34 +180,34 @@ const adminMessage=document.getElementById("adminMessage");
 
 let registrationMode=false;
 let currentUser=null;
-
-let stats={
-bestPercentage:0,
-dominantColor:"white",
-totalPlaySeconds:0,
-cubesCompleted:0,
-bestColors:[]
-};
-
+let stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
 let playTimer=null;
 let lastPlaySave=Date.now();
 let savingStats=false;
 
-function showAuthMessage(message){
-authMessage.textContent=message;
-}
+const MAX_CUBES=21;
+const LINE_COUNT=80;
+const FILL_TIME=3000;
+const GAP=10;
 
-function isValidUsername(username){
-return /^[a-zA-Z0-9_]{3,30}$/.test(username);
-}
+const UNLOCKS=[0,0,10,25,50,100,250,500,1000,2500,5000,10000,25000,50000,100000,250000,500000,1000000,2500000,5000000,10000000,25000000];
 
-function usernameToEmail(username){
-return username.trim().toLowerCase()+"@rcfcg-game.com";
-}
+const cubesContainer=document.getElementById("cubes");
+const addButton=document.getElementById("addCube");
+const removeButton=document.getElementById("removeCube");
+const restartButton=document.getElementById("restart");
+const fastModeCheckbox=document.getElementById("fastModeCheckbox");
 
-function isAdmin(){
-return currentUser?.user_metadata?.username?.toLowerCase()==="updatetest";
-}
+let cubes=[];
+let addingCube=false;
+
+function showAuthMessage(message){authMessage.textContent=message}
+
+function isValidUsername(username){return /^[a-zA-Z0-9_]{3,30}$/.test(username)}
+
+function usernameToEmail(username){return username.trim().toLowerCase()+"@rcfcg-game.com"}
+
+function isAdmin(){return currentUser?.user_metadata?.username?.toLowerCase()==="updatetest"}
 
 function formatTime(seconds){
 seconds=Math.floor(seconds);
@@ -226,66 +217,19 @@ const hours=Math.floor(seconds/3600);
 seconds%=3600;
 const minutes=Math.floor(seconds/60);
 const secs=seconds%60;
-
 if(days>0)return `${days}д ${hours}ч`;
 if(hours>0)return `${hours}ч ${minutes}м`;
 if(minutes>0)return `${minutes}м ${secs}с`;
 return `${secs}с`;
 }
 
-function updateStatsUI(){
-const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
-
-playerStatsName.textContent=username;
-
-bestPercentageStat.textContent=stats.bestPercentage+"%";
-bestPercentageStat.style.color=stats.dominantColor||"white";
-
-playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
-
-cubesCompletedStat.textContent=stats.cubesCompleted;
-
-updateUnlockInfo();
-}
-
-const UNLOCKS=[
-0,
-0,
-10,
-25,
-50,
-100,
-250,
-500,
-1000,
-2500,
-5000,
-10000,
-25000,
-50000,
-100000,
-250000,
-500000,
-1000000,
-2500000,
-5000000,
-10000000,
-25000000
-];
-
 function getMaxCubes(){
-if(isAdmin())return 21;
-
+if(isAdmin())return MAX_CUBES;
 let unlocked=1;
-
-for(let i=2;i<=21;i++){
-if(stats.cubesCompleted>=UNLOCKS[i]){
-unlocked=i;
-}else{
-break;
+for(let i=2;i<=MAX_CUBES;i++){
+if(stats.cubesCompleted>=UNLOCKS[i])unlocked=i;
+else break;
 }
-}
-
 return unlocked;
 }
 
@@ -294,44 +238,36 @@ if(isAdmin()){
 unlockInfo.textContent="updatetest: доступны все 21 куб";
 return;
 }
-
 const max=getMaxCubes();
-
-if(max>=21){
+if(max>=MAX_CUBES){
 unlockInfo.textContent="Открыты все 21 куб";
 return;
 }
-
 const next=max+1;
 const missing=Math.max(0,UNLOCKS[next]-stats.cubesCompleted);
+unlockInfo.textContent=`До открытия ${next}-го куба: ${missing}`;
+}
 
-unlockInfo.textContent=`До открытия ${next} кубов осталось: ${missing}`;
+function updateStatsUI(){
+const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
+playerStatsName.textContent=username;
+bestPercentageStat.textContent=stats.bestPercentage+"%";
+bestPercentageStat.style.color=stats.dominantColor||"white";
+playTimeStat.textContent=formatTime(stats.totalPlaySeconds);
+cubesCompletedStat.textContent=stats.cubesCompleted;
+updateUnlockInfo();
+updateButtons();
 }
 
 async function loadPlayerStats(user){
 if(!user)return;
-
-const {data,error}=await supabaseClient
-.from("leaderboard")
-.select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors")
-.eq("user_id",user.id)
-.maybeSingle();
-
+const {data,error}=await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors").eq("user_id",user.id).maybeSingle();
 if(error){
 console.error("Stats load:",error);
-
-stats={
-bestPercentage:0,
-dominantColor:"white",
-totalPlaySeconds:0,
-cubesCompleted:0,
-bestColors:[]
-};
-
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
 updateStatsUI();
 return;
 }
-
 if(data){
 stats.bestPercentage=Number(data.best_percentage||0);
 stats.dominantColor=data.dominant_color||"white";
@@ -339,27 +275,16 @@ stats.totalPlaySeconds=Number(data.total_play_seconds||0);
 stats.cubesCompleted=Number(data.cubes_completed||0);
 stats.bestColors=Array.isArray(data.colors)?data.colors:[];
 }else{
-stats={
-bestPercentage:0,
-dominantColor:"white",
-totalPlaySeconds:0,
-cubesCompleted:0,
-bestColors:[]
-};
-
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
 await savePlayerStats();
 }
-
 updateStatsUI();
 }
 
 async function savePlayerStats(){
 if(!currentUser||savingStats)return;
-
 savingStats=true;
-
-const username=currentUser.user_metadata?.username||currentUser.email?.split("@")[0]||"Игрок";
-
+const username=currentUser?.user_metadata?.username||currentUser?.email?.split("@")[0]||"Игрок";
 const payload={
 user_id:currentUser.id,
 username:username,
@@ -369,36 +294,22 @@ total_play_seconds:Number(stats.totalPlaySeconds)||0,
 cubes_completed:Number(stats.cubesCompleted)||0,
 colors:Array.isArray(stats.bestColors)?stats.bestColors:[]
 };
-
-const {error}=await supabaseClient
-.from("leaderboard")
-.upsert(payload,{onConflict:"user_id"});
-
-if(error){
-console.error("Stats save:",error);
-}
-
+const {error}=await supabaseClient.from("leaderboard").upsert(payload,{onConflict:"user_id"});
+if(error)console.error("Stats save:",error);
 savingStats=false;
 }
 
 function startPlayTimer(){
 if(playTimer||!currentUser)return;
-
 lastPlaySave=Date.now();
-
 playTimer=setInterval(async()=>{
 const now=Date.now();
 const delta=Math.floor((now-lastPlaySave)/1000);
-
 if(delta>0){
 stats.totalPlaySeconds+=delta;
 lastPlaySave=now;
-
 updateStatsUI();
-
-if(stats.totalPlaySeconds%10<delta){
-await savePlayerStats();
-}
+if(stats.totalPlaySeconds%10<delta)await savePlayerStats();
 }
 },1000);
 }
@@ -407,34 +318,27 @@ async function stopPlayTimer(){
 if(playTimer){
 const now=Date.now();
 const delta=Math.floor((now-lastPlaySave)/1000);
-
 if(delta>0){
 stats.totalPlaySeconds+=delta;
 lastPlaySave=now;
 updateStatsUI();
 }
-
 clearInterval(playTimer);
 playTimer=null;
 }
-
 await savePlayerStats();
 }
 
 function showGame(){
 authScreen.style.display="none";
 game.style.display="block";
-
 adminPanel.style.display=isAdmin()?"block":"none";
-
 if(isAdmin()){
 adminCubeInput.value=stats.cubesCompleted;
 adminMessage.textContent="";
 }
-
 updateStatsUI();
 startPlayTimer();
-
 requestAnimationFrame(updateLayout);
 }
 
@@ -446,33 +350,22 @@ adminPanel.style.display="none";
 
 function enterRegistrationMode(){
 registrationMode=true;
-
 document.getElementById("authTitle").textContent="Регистрация";
-
 loginButton.style.display="none";
 registerText.style.display="none";
-
 registerButton.textContent="Создать аккаунт";
-
 backToLogin.style.display="block";
-
 passwordInput.value="";
-
 showAuthMessage("");
 }
 
 backToLogin.addEventListener("click",()=>{
 registrationMode=false;
-
 document.getElementById("authTitle").textContent="RCFCG";
-
 loginButton.style.display="block";
 registerText.style.display="block";
-
 registerButton.textContent="Зарегистрироваться";
-
 backToLogin.style.display="none";
-
 showAuthMessage("");
 });
 
@@ -481,115 +374,73 @@ if(!registrationMode){
 enterRegistrationMode();
 return;
 }
-
 const username=usernameInput.value.trim().toLowerCase();
 const password=passwordInput.value;
-
 if(!isValidUsername(username)){
 showAuthMessage("Логин: 3–30 символов. Используй только латинские буквы, цифры и _.");
 return;
 }
-
 if(password.length<6){
 showAuthMessage("Пароль должен содержать минимум 6 символов.");
 return;
 }
-
 registerButton.disabled=true;
 showAuthMessage("Создание аккаунта...");
-
 const {data,error}=await supabaseClient.auth.signUp({
 email:usernameToEmail(username),
 password:password,
-options:{
-data:{
-username:username
-}
-}
+options:{data:{username:username}}
 });
-
 registerButton.disabled=false;
-
 if(error){
-showAuthMessage(
-error.message.toLowerCase().includes("already registered")
-?"Такой логин уже занят."
-:"Ошибка: "+error.message
-);
+showAuthMessage(error.message.toLowerCase().includes("already registered")?"Такой логин уже занят.":"Ошибка: "+error.message);
 return;
 }
-
 if(data.session){
 currentUser=data.user;
-
-stats={
-bestPercentage:0,
-dominantColor:"white",
-totalPlaySeconds:0,
-cubesCompleted:0,
-bestColors:[]
-};
-
+stats={bestPercentage:0,dominantColor:"white",totalPlaySeconds:0,cubesCompleted:0,bestColors:[]};
 await savePlayerStats();
-
 showAuthMessage("");
 showGame();
-
 return;
 }
-
 showAuthMessage("Аккаунт создан. Проверь настройки Confirm email в Supabase.");
-
 registrationMode=false;
-
 document.getElementById("authTitle").textContent="RCFCG";
-
 loginButton.style.display="block";
 registerText.style.display="block";
-
 registerButton.textContent="Зарегистрироваться";
-
 backToLogin.style.display="none";
 });
 
 loginButton.addEventListener("click",async()=>{
 const username=usernameInput.value.trim().toLowerCase();
 const password=passwordInput.value;
-
 if(!username){
 showAuthMessage("Введите логин.");
 return;
 }
-
 if(!password){
 showAuthMessage("Введите пароль.");
 return;
 }
-
 if(!isValidUsername(username)){
 showAuthMessage("Неверный логин.");
 return;
 }
-
 loginButton.disabled=true;
 showAuthMessage("Выполняется вход...");
-
 const {data,error}=await supabaseClient.auth.signInWithPassword({
 email:usernameToEmail(username),
 password:password
 });
-
 loginButton.disabled=false;
-
 if(error){
 showAuthMessage("Неверный логин или пароль.");
 return;
 }
-
 currentUser=data.user;
-
 await loadPlayerStats(currentUser);
-
 showAuthMessage("");
 showGame();
 });
@@ -606,120 +457,65 @@ registrationMode?registerButton.click():loginButton.click();
 
 logoutButton.addEventListener("click",async()=>{
 await stopPlayTimer();
-
 await supabaseClient.auth.signOut();
-
 currentUser=null;
-
 showAuth();
-
 usernameInput.value="";
 passwordInput.value="";
-
 registrationMode=false;
-
 document.getElementById("authTitle").textContent="RCFCG";
-
 loginButton.style.display="block";
 registerText.style.display="block";
-
 registerButton.textContent="Зарегистрироваться";
-
 backToLogin.style.display="none";
-
 showAuthMessage("");
 });
 
 adminSaveButton.addEventListener("click",async()=>{
 if(!isAdmin())return;
-
 let value=Math.floor(Number(adminCubeInput.value));
-
 if(!Number.isFinite(value)||value<0)value=0;
-
 if(value>25000000)value=25000000;
-
 stats.cubesCompleted=value;
-
 adminCubeInput.value=value;
-
 updateStatsUI();
-
 adminMessage.textContent="Сохранение...";
-
 await savePlayerStats();
-
 adminMessage.textContent=`Сохранено: ${value} открытых кубов`;
-
-rebuildCubesForUnlockedAmount();
 });
 
 adminResetButton.addEventListener("click",async()=>{
 if(!isAdmin())return;
-
 stats.cubesCompleted=0;
-
 adminCubeInput.value=0;
-
 updateStatsUI();
-
 await savePlayerStats();
-
 adminMessage.textContent="Установлено 0";
-
-rebuildCubesForUnlockedAmount();
 });
-
-const MAX_CUBES=21;
-const LINE_COUNT=80;
-const FILL_TIME=3000;
-const GAP=10;
-
-const cubesContainer=document.getElementById("cubes");
-const addButton=document.getElementById("addCube");
-const removeButton=document.getElementById("removeCube");
-const restartButton=document.getElementById("restart");
-const fastModeCheckbox=document.getElementById("fastModeCheckbox");
-
-let cubes=[];
 
 function randomColor(){
 const hue=Math.floor(Math.random()*360);
 const saturation=75+Math.random()*25;
 const lightness=50+Math.random()*20;
-
-return{
-css:`hsl(${hue},${saturation}%,${lightness}%)`,
-hue:hue
-};
+return{css:`hsl(${hue},${saturation}%,${lightness}%)`,hue:hue};
 }
 
 function generateColors(){
 const colors=[];
-
-for(let i=0;i<LINE_COUNT;i++){
-colors.push(randomColor());
-}
-
+for(let i=0;i<LINE_COUNT;i++)colors.push(randomColor());
 return colors;
 }
 
 function createCube(){
 const cube=document.createElement("div");
 cube.className="cube";
-
 const canvas=document.createElement("canvas");
-
 cube.appendChild(canvas);
-
 const percentage=document.createElement("div");
 percentage.className="percentage";
 percentage.textContent="0%";
-
 cube.appendChild(percentage);
-
 cubesContainer.appendChild(cube);
-
 const data={
 element:cube,
 canvas:canvas,
@@ -730,24 +526,17 @@ animation:null,
 showPercentage:false,
 counted:false
 };
-
 cubes.push(data);
-
 resizeCube(data);
-
 return data;
 }
 
 function resizeCube(data){
 const rect=data.element.getBoundingClientRect();
-
 if(rect.width<=0||rect.height<=0)return;
-
 const size=Math.floor(Math.min(rect.width,rect.height));
-
 data.canvas.width=size;
 data.canvas.height=size;
-
 drawCube(data,data.progress);
 }
 
@@ -755,121 +544,76 @@ function drawCube(data,progress){
 const canvas=data.canvas;
 const ctx=canvas.getContext("2d");
 const size=canvas.width;
-
 if(size<=0)return;
-
 ctx.clearRect(0,0,size,size);
-
 const center=size/2;
 const lineHeight=size/LINE_COUNT;
 
 ctx.save();
-
 ctx.beginPath();
 ctx.moveTo(0,0);
 ctx.lineTo(center,center);
 ctx.lineTo(0,size);
 ctx.closePath();
 ctx.clip();
-
 for(let i=0;i<LINE_COUNT;i++){
 const y=i*lineHeight;
 const maxX=center*(1-Math.abs(y+lineHeight/2-center)/center);
-
 ctx.fillStyle=data.colors[i].css;
-
-ctx.fillRect(
-0,
-y,
-maxX*progress,
-lineHeight+1
-);
+ctx.fillRect(0,y,maxX*progress,lineHeight+1);
 }
-
 ctx.restore();
 
 ctx.save();
-
 ctx.beginPath();
 ctx.moveTo(size,0);
 ctx.lineTo(center,center);
 ctx.lineTo(size,size);
 ctx.closePath();
 ctx.clip();
-
 for(let i=0;i<LINE_COUNT;i++){
 const y=i*lineHeight;
 const maxX=center*(1-Math.abs(y+lineHeight/2-center)/center);
 const currentX=maxX*progress;
-
 ctx.fillStyle=data.colors[(i+20)%LINE_COUNT].css;
-
-ctx.fillRect(
-size-currentX,
-y,
-currentX,
-lineHeight+1
-);
+ctx.fillRect(size-currentX,y,currentX,lineHeight+1);
 }
-
 ctx.restore();
 
 ctx.save();
-
 ctx.beginPath();
 ctx.moveTo(0,0);
 ctx.lineTo(size,0);
 ctx.lineTo(center,center);
 ctx.closePath();
 ctx.clip();
-
 const lineWidth=size/LINE_COUNT;
-
 for(let i=0;i<LINE_COUNT;i++){
 const x=i*lineWidth;
 const maxY=center*(1-Math.abs(x+lineWidth/2-center)/center);
-
 ctx.fillStyle=data.colors[(i+40)%LINE_COUNT].css;
-
-ctx.fillRect(
-x,
-0,
-lineWidth+1,
-maxY*progress
-);
+ctx.fillRect(x,0,lineWidth+1,maxY*progress);
 }
-
 ctx.restore();
 
 ctx.save();
-
 ctx.beginPath();
 ctx.moveTo(0,size);
 ctx.lineTo(center,center);
 ctx.lineTo(size,size);
 ctx.closePath();
 ctx.clip();
-
 for(let i=0;i<LINE_COUNT;i++){
 const x=i*lineWidth;
 const maxY=center*(1-Math.abs(x+lineWidth/2-center)/center);
 const currentY=maxY*progress;
-
 ctx.fillStyle=data.colors[(i+60)%LINE_COUNT].css;
-
-ctx.fillRect(
-x,
-size-currentY,
-lineWidth+1,
-currentY
-);
+ctx.fillRect(x,size-currentY,lineWidth+1,currentY);
 }
-
 ctx.restore();
 
 if(progress>=1){
 ctx.fillStyle="#fff";
-
 ctx.beginPath();
 ctx.arc(center,center,2,0,Math.PI*2);
 ctx.fill();
@@ -878,40 +622,23 @@ ctx.fill();
 
 function animateCube(data){
 data.counted=false;
-
 if(fastModeCheckbox.checked){
-if(data.animation){
-cancelAnimationFrame(data.animation);
-}
-
+if(data.animation)cancelAnimationFrame(data.animation);
 data.progress=0;
-
 drawCube(data,0);
-
 requestAnimationFrame(()=>{
 data.progress=1;
-
 drawCube(data,1);
-
 completeCube(data);
 });
-
 return;
 }
-
-if(data.animation){
-cancelAnimationFrame(data.animation);
-}
-
+if(data.animation)cancelAnimationFrame(data.animation);
 const start=performance.now();
-
 function frame(now){
 const elapsed=now-start;
-
 data.progress=Math.min(elapsed/FILL_TIME,1);
-
 drawCube(data,data.progress);
-
 if(data.progress<1){
 data.animation=requestAnimationFrame(frame);
 }else{
@@ -919,119 +646,74 @@ data.animation=null;
 completeCube(data);
 }
 }
-
 data.progress=0;
-
 data.animation=requestAnimationFrame(frame);
 }
 
 function getDominantColor(data){
 const groups=[];
-
 data.colors.forEach(color=>{
 let found=null;
-
 for(const group of groups){
 let difference=Math.abs(color.hue-group.hue);
-
 difference=Math.min(difference,360-difference);
-
 if(difference<=5){
 found=group;
 break;
 }
 }
-
 if(found){
 found.count++;
 }else{
-groups.push({
-hue:color.hue,
-count:1,
-css:color.css
-});
+groups.push({hue:color.hue,count:1,css:color.css});
 }
 });
-
 groups.sort((a,b)=>b.count-a.count);
-
 return groups[0];
 }
 
-/*
-Главное изменение:
-процент рассчитывается автоматически сразу после полного заполнения куба.
-*/
 async function showPercentageAutomatically(data){
 if(!data||data.progress<1)return;
-
 if(data.showPercentage)return;
-
 const dominant=getDominantColor(data);
-
-const percentage=Math.round(
-dominant.count/LINE_COUNT*100
-);
-
+const percentage=Math.round(dominant.count/LINE_COUNT*100);
 data.percentage.textContent=percentage+"%";
-
 data.percentage.style.color=dominant.css;
-
 data.percentage.style.display="block";
-
 data.showPercentage=true;
-
 if(percentage>stats.bestPercentage){
-
 stats.bestPercentage=percentage;
-
 stats.dominantColor=dominant.css;
-
 stats.bestColors=data.colors.map(color=>color.css);
-
 updateStatsUI();
-
 await savePlayerStats();
 }
 }
 
 async function completeCube(data){
 if(data.counted||data.progress<1)return;
-
 data.counted=true;
-
 stats.cubesCompleted++;
-
 updateStatsUI();
-
 await showPercentageAutomatically(data);
-
 await savePlayerStats();
 }
 
 function updateLayout(){
 const count=cubes.length;
-
 if(!count)return;
-
 const gameArea=document.getElementById("gameArea");
-
 const areaWidth=gameArea.clientWidth;
 const areaHeight=gameArea.clientHeight;
-
 let bestColumns=1;
 let bestRows=count;
 let bestSize=0;
 
 for(let columns=1;columns<=count;columns++){
-
 const rows=Math.ceil(count/columns);
-
 const width=(areaWidth-GAP*(columns-1))/columns;
 const height=(areaHeight-GAP*(rows-1))/rows;
-
 const size=Math.floor(Math.min(width,height));
-
 if(size>bestSize){
 bestSize=size;
 bestColumns=columns;
@@ -1039,28 +721,19 @@ bestRows=rows;
 }
 }
 
-cubesContainer.style.gridTemplateColumns=
-`repeat(${bestColumns},${bestSize}px)`;
-
-cubesContainer.style.gridTemplateRows=
-`repeat(${bestRows},${bestSize}px)`;
-
+cubesContainer.style.gridTemplateColumns=`repeat(${bestColumns},${bestSize}px)`;
+cubesContainer.style.gridTemplateRows=`repeat(${bestRows},${bestSize}px)`;
 cubes.forEach(resizeCube);
 }
 
 function updateButtons(){
 const count=cubes.length;
 const maxAllowed=getMaxCubes();
-
 addButton.textContent=`Добавить куб ${count}/${maxAllowed}`;
-
-addButton.disabled=count>=maxAllowed;
-
+addButton.disabled=addingCube||count>=maxAllowed;
 removeButton.style.display=count>=2?"block":"none";
-
-fastModeCheckbox.disabled=count<10&&!isAdmin();
-
-if(count<10&&!isAdmin()){
+fastModeCheckbox.disabled=count<10;
+if(count<10){
 fastModeCheckbox.checked=false;
 fastModeCheckbox.title="Быстрый режим откроется на 10 кубах";
 }else{
@@ -1068,101 +741,64 @@ fastModeCheckbox.title="";
 }
 }
 
-function rebuildCubesForUnlockedAmount(){
-const allowed=getMaxCubes();
-
-while(cubes.length>allowed){
-
-const removed=cubes.pop();
-
-if(removed.animation){
-cancelAnimationFrame(removed.animation);
-}
-
-removed.element.remove();
-}
-
-if(cubes.length===0){
-const cube=createCube();
-animateCube(cube);
-}
-
-updateButtons();
-updateLayout();
-}
-
 addButton.addEventListener("click",()=>{
+if(addingCube)return;
 const maxAllowed=getMaxCubes();
-
-if(cubes.length>=maxAllowed)return;
-
-const cube=createCube();
-
-updateLayout();
+if(cubes.length>=maxAllowed){
 updateButtons();
-
+return;
+}
+if(cubes.length>=MAX_CUBES){
+updateButtons();
+return;
+}
+addingCube=true;
+updateButtons();
+const cube=createCube();
+updateLayout();
 requestAnimationFrame(()=>{
 resizeCube(cube);
 animateCube(cube);
 });
+setTimeout(()=>{
+addingCube=false;
+updateButtons();
+},250);
 });
 
 removeButton.addEventListener("click",()=>{
 if(cubes.length<=1)return;
-
 const removed=cubes.pop();
-
-if(removed.animation){
-cancelAnimationFrame(removed.animation);
-}
-
+if(removed.animation)cancelAnimationFrame(removed.animation);
 removed.element.remove();
-
 updateLayout();
 updateButtons();
 });
 
 restartButton.addEventListener("click",()=>{
 cubes.forEach(cube=>{
-
-if(cube.animation){
-cancelAnimationFrame(cube.animation);
-}
-
+if(cube.animation)cancelAnimationFrame(cube.animation);
 cube.colors=generateColors();
-
 cube.progress=0;
-
 cube.counted=false;
-
 cube.percentage.style.display="none";
-
 cube.percentage.textContent="0%";
-
 cube.showPercentage=false;
 });
-
 cubes.forEach(animateCube);
 });
 
 fastModeCheckbox.addEventListener("change",()=>{
-if(cubes.length<10&&!isAdmin()){
+if(cubes.length<10){
 fastModeCheckbox.checked=false;
 return;
 }
-
 cubes.forEach(cube=>{
-
-if(cube.animation){
-cancelAnimationFrame(cube.animation);
-}
-
+if(cube.animation)cancelAnimationFrame(cube.animation);
 cube.progress=0;
 cube.counted=false;
 cube.showPercentage=false;
-
 cube.percentage.style.display="none";
-
 animateCube(cube);
 });
 });
@@ -1173,7 +809,6 @@ const leaderboardButton=document.getElementById("leaderboardButton");
 const leaderboardScreen=document.getElementById("leaderboardScreen");
 const leaderboardBack=document.getElementById("leaderboardBack");
 const leaderboardMessage=document.getElementById("leaderboardMessage");
-
 const leaderboardSlots=[
 document.getElementById("slot0"),
 document.getElementById("slot1"),
@@ -1184,60 +819,42 @@ let leaderboardMode="percentage";
 
 function clearLeaderboardCubes(){
 leaderboardSlots.forEach(slot=>{
-
 const canvas=slot.querySelector("canvas");
 const percentageEl=slot.querySelector(".lbPercentage");
 const wrap=slot.querySelector(".lbCubeWrap");
 const ctx=canvas.getContext("2d");
-
 ctx.clearRect(0,0,canvas.width,canvas.height);
-
 percentageEl.textContent="";
-
 wrap.style.display="none";
 });
 }
 
 function drawLeaderboardCube(canvas,colors){
 const ctx=canvas.getContext("2d");
-
 const size=canvas.width;
-
 ctx.clearRect(0,0,size,size);
-
 if(!Array.isArray(colors)||colors.length!==LINE_COUNT){
 ctx.fillStyle="#000";
 ctx.fillRect(0,0,size,size);
 return;
 }
-
 const data={
 canvas:canvas,
-colors:colors.map(css=>({
-css:css,
-hue:0
-}))
+colors:colors.map(css=>({css:css,hue:0}))
 };
-
 drawCube(data,1);
 }
 
 function renderLeaderboardSlot(slot,row,mode){
-
 const canvas=slot.querySelector("canvas");
 const percentageEl=slot.querySelector(".lbPercentage");
 const nameEl=slot.querySelector(".lbName");
 const wrap=slot.querySelector(".lbCubeWrap");
-
 const size=Math.floor(slot.getBoundingClientRect().width);
-
 canvas.width=size>0?size:200;
 canvas.height=canvas.width;
-
 const ctx=canvas.getContext("2d");
-
 ctx.clearRect(0,0,canvas.width,canvas.height);
-
 nameEl.textContent=row?row.username:"—";
 
 if(!row){
@@ -1247,116 +864,57 @@ return;
 }
 
 if(mode==="percentage"){
-
 wrap.style.display="block";
-
-drawLeaderboardCube(
-canvas,
-Array.isArray(row.colors)?row.colors:[]
-);
-
-percentageEl.textContent=
-Number(row.best_percentage||0)+"%";
-
-percentageEl.style.color=
-row.dominant_color||"white";
-
+drawLeaderboardCube(canvas,Array.isArray(row.colors)?row.colors:[]);
+percentageEl.textContent=Number(row.best_percentage||0)+"%";
+percentageEl.style.color=row.dominant_color||"white";
 }else{
-
 wrap.style.display="none";
-
 percentageEl.textContent="";
 }
 
 if(mode==="time"){
-
-nameEl.textContent=
-`${row.username} — ${formatTime(row.total_play_seconds)}`;
-
+nameEl.textContent=`${row.username} — ${formatTime(row.total_play_seconds)}`;
 }else if(mode==="cubes"){
-
-nameEl.textContent=
-`${row.username} — ${row.cubes_completed} кубов`;
+nameEl.textContent=`${row.username} — ${row.cubes_completed} кубов`;
 }
 }
 
 async function loadLeaderboard(mode){
-
 leaderboardMode=mode;
-
 document.querySelectorAll(".lbTab").forEach(tab=>{
-tab.classList.toggle(
-"active",
-tab.dataset.mode===mode
-);
+tab.classList.toggle("active",tab.dataset.mode===mode);
 });
-
 leaderboardMessage.textContent="Загрузка...";
+if(mode!=="percentage")clearLeaderboardCubes();
 
-if(mode!=="percentage"){
-clearLeaderboardCubes();
-}
+let query=supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,colors,total_play_seconds,cubes_completed");
 
-let query=supabaseClient
-.from("leaderboard")
-.select(
-"username,best_percentage,dominant_color,colors,total_play_seconds,cubes_completed"
-);
-
-if(mode==="percentage"){
-query=query.order(
-"best_percentage",
-{ascending:false}
-);
-}
-
-if(mode==="time"){
-query=query.order(
-"total_play_seconds",
-{ascending:false}
-);
-}
-
-if(mode==="cubes"){
-query=query.order(
-"cubes_completed",
-{ascending:false}
-);
-}
+if(mode==="percentage")query=query.order("best_percentage",{ascending:false});
+if(mode==="time")query=query.order("total_play_seconds",{ascending:false});
+if(mode==="cubes")query=query.order("cubes_completed",{ascending:false});
 
 const {data,error}=await query.limit(3);
 
 if(error){
-
 console.error("Leaderboard load:",error);
-
-leaderboardMessage.textContent=
-"Не удалось загрузить таблицу лидеров.";
-
+leaderboardMessage.textContent="Не удалось загрузить таблицу лидеров.";
 return;
 }
 
-leaderboardMessage.textContent=
-data.length?"":"Пока нет результатов.";
+leaderboardMessage.textContent=data.length?"":"Пока нет результатов.";
 
 requestAnimationFrame(()=>{
 leaderboardSlots.forEach((slot,index)=>{
-renderLeaderboardSlot(
-slot,
-data[index]||null,
-mode
-);
+renderLeaderboardSlot(slot,data[index]||null,mode);
 });
 });
 }
 
 leaderboardButton.addEventListener("click",async()=>{
 await savePlayerStats();
-
 game.style.display="none";
-
 leaderboardScreen.style.display="flex";
-
 await loadLeaderboard("percentage");
 });
 
@@ -1368,43 +926,32 @@ await loadLeaderboard(tab.dataset.mode);
 
 leaderboardBack.addEventListener("click",()=>{
 leaderboardScreen.style.display="none";
-
 game.style.display="block";
-
 requestAnimationFrame(updateLayout);
 });
 
 createCube();
-
 updateLayout();
-
 updateButtons();
 
 requestAnimationFrame(()=>{
+if(cubes[0]){
 resizeCube(cubes[0]);
 animateCube(cubes[0]);
-});
-
-window.addEventListener("beforeunload",()=>{
-if(currentUser){
-savePlayerStats();
 }
 });
 
+window.addEventListener("beforeunload",()=>{
+if(currentUser)savePlayerStats();
+});
+
 async function checkSession(){
-
 const {data}=await supabaseClient.auth.getSession();
-
 if(data.session){
-
 currentUser=data.session.user;
-
 await loadPlayerStats(currentUser);
-
 showGame();
-
 }else{
-
 showAuth();
 }
 }
