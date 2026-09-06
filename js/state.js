@@ -9,3 +9,7 @@ let cubes = [];
 let addingCube = false;
 
 let donutBoostActive = false;
+
+let autoClickActive = false;
+let autoClickTimer = null;
+let lastAutoClickTime = 0;

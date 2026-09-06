@@ -32,6 +32,7 @@ function showAuth() {
     authScreen.style.display = "flex";
     adminPanel.style.display = "none";
     stopDonutSpawner();
+    stopAutoClicker();
 }
 
 function enterRegistrationMode() {

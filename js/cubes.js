@@ -3,6 +3,10 @@ const addButton = document.getElementById("addCube");
 const removeButton = document.getElementById("removeCube");
 const restartButton = document.getElementById("restart");
 const fastModeCheckbox = document.getElementById("fastModeCheckbox");
+const autoClickCheckbox = document.getElementById("autoClickCheckbox");
+
+const AUTO_CLICK_MIN_CUBES = 10;
+const AUTO_CLICK_INTERVALS = [1000, 900, 800, 700, 600, 500, 400, 300, 200, 100, 50, 10];
 
 function createCube() {
     const cube = document.createElement("div");
@@ -231,6 +235,73 @@ function updateButtons() {
     removeButton.style.display = count >= 2 ? "block" : "none";
     fastModeCheckbox.disabled = false;
     fastModeCheckbox.title = "";
+
+    const autoClickAvailable = count >= AUTO_CLICK_MIN_CUBES && fastModeCheckbox.checked;
+    autoClickCheckbox.disabled = !autoClickAvailable;
+    if (!autoClickAvailable) {
+        stopAutoClicker();
+        autoClickCheckbox.checked = false;
+        autoClickCheckbox.title = count < AUTO_CLICK_MIN_CUBES ? "Нужно 10 кубов" : "Требуется быстрый режим";
+    } else {
+        autoClickCheckbox.title = `Скорость: 1 клик / ${(getAutoClickInterval() / 1000).toLocaleString("ru-RU")} сек`;
+    }
+}
+
+function getAutoClickInterval() {
+    const count = cubes.length;
+    if (count < AUTO_CLICK_MIN_CUBES) return null;
+    const index = Math.min(count - AUTO_CLICK_MIN_CUBES, AUTO_CLICK_INTERVALS.length - 1);
+    return AUTO_CLICK_INTERVALS[index];
+}
+
+function autoClickTick() {
+    if (!autoClickActive) return;
+    if (!fastModeCheckbox.checked || cubes.length < AUTO_CLICK_MIN_CUBES) {
+        stopAutoClicker();
+        return;
+    }
+    const donutEl = document.getElementById("donut");
+    if (donutEl && donutEl.style.display === "block") {
+        donutEl.click();
+    }
+    restartButton.click();
+}
+
+function startAutoClicker() {
+    if (autoClickTimer) return;
+    const interval = getAutoClickInterval();
+    if (interval === null) {
+        stopAutoClicker();
+        return;
+    }
+    autoClickActive = true;
+    autoClickCheckbox.checked = true;
+    lastAutoClickTime = performance.now();
+    autoClickTick();
+    autoClickTimer = setInterval(autoClickTick, interval);
+}
+
+function stopAutoClicker() {
+    autoClickActive = false;
+    if (autoClickTimer) {
+        clearInterval(autoClickTimer);
+        autoClickTimer = null;
+    }
+    autoClickCheckbox.checked = false;
+}
+
+function restartAutoClickTimer() {
+    if (!autoClickActive) return;
+    const interval = getAutoClickInterval();
+    if (interval === null) {
+        stopAutoClicker();
+        return;
+    }
+    if (autoClickTimer) {
+        clearInterval(autoClickTimer);
+        autoClickTimer = null;
+    }
+    autoClickTimer = setInterval(autoClickTick, interval);
 }
 
 addButton.addEventListener("click", () => {
@@ -255,6 +326,7 @@ addButton.addEventListener("click", () => {
     setTimeout(() => {
         addingCube = false;
         updateButtons();
+        restartAutoClickTimer();
     }, 250);
 });
 
@@ -265,6 +337,7 @@ removeButton.addEventListener("click", () => {
     removed.element.remove();
     updateLayout();
     updateButtons();
+    restartAutoClickTimer();
 });
 
 restartButton.addEventListener("click", () => {
@@ -281,6 +354,9 @@ restartButton.addEventListener("click", () => {
 });
 
 fastModeCheckbox.addEventListener("change", () => {
+    if (!fastModeCheckbox.checked) {
+        stopAutoClicker();
+    }
     cubes.forEach(cube => {
         if (cube.animation) cancelAnimationFrame(cube.animation);
         cube.animation = null;
@@ -291,6 +367,19 @@ fastModeCheckbox.addEventListener("change", () => {
         cube.percentage.textContent = "0%";
         animateCube(cube);
     });
+    updateButtons();
+});
+
+autoClickCheckbox.addEventListener("change", () => {
+    if (autoClickCheckbox.checked) {
+        if (!fastModeCheckbox.checked || cubes.length < AUTO_CLICK_MIN_CUBES) {
+            autoClickCheckbox.checked = false;
+            return;
+        }
+        startAutoClicker();
+    } else {
+        stopAutoClicker();
+    }
 });
 
 window.addEventListener("resize", updateLayout);
