@@ -4,8 +4,8 @@ const removeButton = document.getElementById("removeCube");
 const restartButton = document.getElementById("restart");
 const fastModeCheckbox = document.getElementById("fastModeCheckbox");
 const autoClickCheckbox = document.getElementById("autoClickCheckbox");
+const disableAllCheckbox = document.getElementById("disableAllCheckbox");
 
-const AUTO_CLICK_MIN_CUBES = 10;
 const AUTO_CLICK_INTERVALS = [1000, 900, 800, 700, 600, 500, 400, 300, 200, 100, 50, 10];
 
 function createCube() {
@@ -227,36 +227,56 @@ function updateLayout() {
     cubes.forEach(resizeCube);
 }
 
+function isAutoClickAllowed() {
+    // Автокликер доступен, если максимальное количество кубов у игрока больше 10
+    return getMaxCubes() > 10;
+}
+
 function updateButtons() {
     const count = cubes.length;
     const maxAllowed = getMaxCubes();
     addButton.textContent = `Добавить куб ${count}/${maxAllowed}`;
     addButton.disabled = addingCube || count >= maxAllowed;
     removeButton.style.display = count >= 2 ? "block" : "none";
+    removeButton.disabled = false;
     fastModeCheckbox.disabled = false;
     fastModeCheckbox.title = "";
+    const leaderboardButton = document.getElementById("leaderboardButton");
+    leaderboardButton.disabled = false;
 
-    const autoClickAvailable = count >= AUTO_CLICK_MIN_CUBES && fastModeCheckbox.checked;
+    const autoClickAvailable = isAutoClickAllowed() && fastModeCheckbox.checked;
     autoClickCheckbox.disabled = !autoClickAvailable;
     if (!autoClickAvailable) {
         stopAutoClicker();
         autoClickCheckbox.checked = false;
-        autoClickCheckbox.title = count < AUTO_CLICK_MIN_CUBES ? "Нужно 10 кубов" : "Требуется быстрый режим";
+        autoClickCheckbox.title = !isAutoClickAllowed() ? "Нужно больше 10 максимальных кубов" : "Требуется быстрый режим";
     } else {
         autoClickCheckbox.title = `Скорость: 1 клик / ${(getAutoClickInterval() / 1000).toLocaleString("ru-RU")} сек`;
     }
+
+    // Логика галочки "Отключить всё кроме заново"
+    const disableAll = disableAllCheckbox.checked;
+    if (disableAll) {
+        addButton.disabled = true;
+        removeButton.disabled = true;
+        leaderboardButton.disabled = true;
+    }
+    // Кнопка "Заново" (restartButton) всегда остаётся активной
+    // Галочки (Быстрый режим, Автокликер) остаются активными
 }
 
 function getAutoClickInterval() {
     const count = cubes.length;
-    if (count < AUTO_CLICK_MIN_CUBES) return null;
-    const index = Math.min(count - AUTO_CLICK_MIN_CUBES, AUTO_CLICK_INTERVALS.length - 1);
+    if (count < 1) return null;
+    // Для количества кубов меньше 10 используем самый медленный интервал (1000 мс)
+    if (count < 10) return AUTO_CLICK_INTERVALS[0];
+    const index = Math.min(count - 10, AUTO_CLICK_INTERVALS.length - 1);
     return AUTO_CLICK_INTERVALS[index];
 }
 
 function autoClickTick() {
     if (!autoClickActive) return;
-    if (!fastModeCheckbox.checked || cubes.length < AUTO_CLICK_MIN_CUBES) {
+    if (!fastModeCheckbox.checked || !isAutoClickAllowed()) {
         stopAutoClicker();
         return;
     }
@@ -372,7 +392,7 @@ fastModeCheckbox.addEventListener("change", () => {
 
 autoClickCheckbox.addEventListener("change", () => {
     if (autoClickCheckbox.checked) {
-        if (!fastModeCheckbox.checked || cubes.length < AUTO_CLICK_MIN_CUBES) {
+        if (!fastModeCheckbox.checked || !isAutoClickAllowed()) {
             autoClickCheckbox.checked = false;
             return;
         }
@@ -380,6 +400,10 @@ autoClickCheckbox.addEventListener("change", () => {
     } else {
         stopAutoClicker();
     }
+});
+
+disableAllCheckbox.addEventListener("change", () => {
+    updateButtons();
 });
 
 window.addEventListener("resize", updateLayout);

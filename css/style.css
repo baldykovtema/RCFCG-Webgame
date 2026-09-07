@@ -226,6 +226,25 @@ canvas {
     cursor: pointer
 }
 
+#disableAllMode {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 2px
+}
+
+#disableAllMode input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    cursor: pointer
+}
+
 button {
     border: 1px solid rgba(255, 255, 255, .18);
     border-radius: 8px;
@@ -285,11 +304,29 @@ button:disabled {
     background: rgba(46, 139, 87, .3)
 }
 
-#logoutButton {
+#topRightControls {
     position: fixed;
     top: 15px;
     right: 15px;
     z-index: 200;
+    display: flex;
+    align-items: center;
+    gap: 10px
+}
+
+#donutTimer {
+    color: #ffd700;
+    font-size: 14px;
+    font-weight: bold;
+    background: rgba(0, 0, 0, .6);
+    border: 1px solid rgba(255, 215, 0, .3);
+    border-radius: 8px;
+    padding: 9px 14px;
+    white-space: nowrap;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, .8)
+}
+
+#logoutButton {
     padding: 9px 14px;
     font-size: 14px;
     background: rgba(181, 43, 43, .2)
