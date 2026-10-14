@@ -29,10 +29,10 @@ function randomColor() {
 
 function generateColors() {
     const colors = [];
-    if (donutBoostActive) {
+    if (donutBoostActive || goldenDonutBoostActive) {
         // Бонус пончика: 20% цветов одного оттенка → шанс большого процента x2.5
         const dominantHue = Math.floor(Math.random() * 360);
-        const dominantCount = Math.floor(LINE_COUNT * 0.2);
+        const dominantCount = Math.floor(LINE_COUNT * (goldenDonutBoostActive ? 0.4 : 0.2));
         for (let i = 0; i < LINE_COUNT; i++) {
             if (i < dominantCount) {
                 const saturation = 75 + Math.random() * 25;

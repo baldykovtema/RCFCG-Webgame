@@ -284,6 +284,8 @@ function autoClickTick() {
     if (donutEl && donutEl.style.display === "block") {
         donutEl.click();
     }
+    const golden = document.getElementById("goldenDonut");
+    if (golden.style.display === "block") golden.click();
     restartButton.click();
 }
 

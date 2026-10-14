@@ -1,91 +1,91 @@
-const donut = document.getElementById("donut");
+const DONUT_INTERVAL = 5 * 60 * 1000;
+const GOLDEN_DONUT_INTERVAL = 30 * 60 * 1000;
+const DONUT_BOOST_DURATION = 60 * 1000;
+const DONUT_VISIBLE_DURATION = 15 * 1000;
 const donutBoostInfo = document.getElementById("donutBoostInfo");
-const donutTimerEl = document.getElementById("donutTimer");
-
-const DONUT_INTERVAL = 5 * 60 * 1000; // 5 минут
-const DONUT_BOOST_DURATION = 60 * 1000; // 1 минута
-const DONUT_VISIBLE_DURATION = 15 * 1000; // пончик виден 15 секунд
-
-let donutTimer = null;
-let donutBoostTimer = null;
-let donutCountdownTimer = null;
-let nextDonutTime = 0;
 
 function formatDonutTime(ms) {
-    const totalSeconds = Math.max(0, Math.ceil(ms / 1000));
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = totalSeconds % 60;
-    return `${minutes}:${seconds.toString().padStart(2, "0")}`;
+    const seconds = Math.max(0, Math.ceil(ms / 1000));
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, "0")}`;
 }
 
-function updateDonutTimerDisplay() {
-    if (!currentUser) return;
-    const remaining = nextDonutTime - Date.now();
-    if (remaining <= 0) {
-        donutTimerEl.textContent = "🍩 0:00";
-        return;
+function updateBoostInfo() {
+    donutBoostInfo.style.display = donutBoostActive || goldenDonutBoostActive ? "block" : "none";
+    donutBoostInfo.textContent = goldenDonutBoostActive ? "Золотой 🍩 Бонус: шанс x5.0!" : "🍩 Бонус: шанс x2.5!";
+}
+
+function createDonutSpawner(id, timerId, interval, golden = false) {
+    const element = document.getElementById(id);
+    const timer = document.getElementById(timerId);
+    const label = golden ? "Золотой 🍩" : "🍩";
+    let spawnTimer, hideTimer, boostTimer, countdownTimer, nextTime;
+    function updateTimer() {
+        timer.textContent = `${label} ${formatDonutTime(nextTime - Date.now())}`;
     }
-    donutTimerEl.textContent = `🍩 ${formatDonutTime(remaining)}`;
-}
-
-function startDonutCountdown() {
-    if (donutCountdownTimer) clearInterval(donutCountdownTimer);
-    nextDonutTime = Date.now() + DONUT_INTERVAL;
-    updateDonutTimerDisplay();
-    donutCountdownTimer = setInterval(updateDonutTimerDisplay, 1000);
-}
-
-function stopDonutCountdown() {
-    if (donutCountdownTimer) {
-        clearInterval(donutCountdownTimer);
-        donutCountdownTimer = null;
+    function schedule() {
+        clearTimeout(spawnTimer);
+        nextTime = Date.now() + interval;
+        updateTimer();
+        spawnTimer = setTimeout(show, interval);
     }
-    donutTimerEl.textContent = "🍩 --:--";
+    function show() {
+        if (!currentUser) return;
+        clearTimeout(spawnTimer);
+        clearTimeout(hideTimer);
+        nextTime = Date.now();
+        element.style.display = "block";
+        updateTimer();
+        hideTimer = setTimeout(() => {
+            element.style.display = "none";
+            schedule();
+        }, DONUT_VISIBLE_DURATION);
+    }
+    function collect() {
+        if (!currentUser || element.style.display !== "block") return;
+        clearTimeout(hideTimer);
+        element.style.display = "none";
+        if (golden) goldenDonutBoostActive = true;
+        else donutBoostActive = true;
+        updateBoostInfo();
+        clearTimeout(boostTimer);
+        boostTimer = setTimeout(() => {
+            if (golden) goldenDonutBoostActive = false;
+            else donutBoostActive = false;
+            updateBoostInfo();
+        }, DONUT_BOOST_DURATION);
+        schedule();
+    }
+    element.addEventListener("click", collect);
+    element.addEventListener("keydown", event => {
+        if (event.key === "Enter" || event.key === " ") { event.preventDefault(); collect(); }
+    });
+    return {
+        show,
+        start() {
+            if (countdownTimer) return;
+            schedule();
+            countdownTimer = setInterval(updateTimer, 1000);
+        },
+        stop() {
+            clearTimeout(spawnTimer);
+            clearTimeout(hideTimer);
+            clearTimeout(boostTimer);
+            clearInterval(countdownTimer);
+            countdownTimer = null;
+            element.style.display = "none";
+            timer.textContent = `${label} --:--`;
+        }
+    };
 }
-
-function showDonut() {
-    if (!currentUser) return;
-    donut.style.display = "block";
-    donutTimerEl.textContent = "🍩 0:00";
-    // Пончик виден 15 секунд, после чего таймер перезапускается
-    setTimeout(() => {
-        donut.style.display = "none";
-        startDonutCountdown();
-    }, DONUT_VISIBLE_DURATION);
-}
-
-function activateDonutBoost() {
-    donutBoostActive = true;
-    donutBoostInfo.style.display = "block";
-    donut.style.display = "none";
-    if (donutBoostTimer) clearTimeout(donutBoostTimer);
-    donutBoostTimer = setTimeout(() => {
-        donutBoostActive = false;
-        donutBoostInfo.style.display = "none";
-    }, DONUT_BOOST_DURATION);
-    // После активации бонуса перезапускаем таймер до следующего пончика
-    startDonutCountdown();
-}
-
-donut.addEventListener("click", activateDonutBoost);
-
-function startDonutSpawner() {
-    if (donutTimer) return;
-    startDonutCountdown();
-    donutTimer = setInterval(showDonut, DONUT_INTERVAL);
-}
-
+const regularDonutSpawner = createDonutSpawner("donut", "donutTimer", DONUT_INTERVAL);
+const goldenDonutSpawner = createDonutSpawner("goldenDonut", "goldenDonutTimer", GOLDEN_DONUT_INTERVAL, true);
+function showDonut() { regularDonutSpawner.show(); }
+function startDonutSpawner() { regularDonutSpawner.start(); goldenDonutSpawner.start(); }
 function stopDonutSpawner() {
-    if (donutTimer) {
-        clearInterval(donutTimer);
-        donutTimer = null;
-    }
-    donut.style.display = "none";
-    donutBoostActive = false;
-    donutBoostInfo.style.display = "none";
-    if (donutBoostTimer) {
-        clearTimeout(donutBoostTimer);
-        donutBoostTimer = null;
-    }
-    stopDonutCountdown();
+    regularDonutSpawner.stop();
+    goldenDonutSpawner.stop();
+    donutBoostActive = goldenDonutBoostActive = false;
+    updateBoostInfo();
 }
+document.getElementById("spawnDonutButton").addEventListener("click", () => { if (isAdmin()) regularDonutSpawner.show(); });
+document.getElementById("spawnGoldenDonutButton").addEventListener("click", () => { if (isAdmin()) goldenDonutSpawner.show(); });

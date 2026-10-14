@@ -65,6 +65,10 @@ registerButton.addEventListener("click", async () => {
     }
     const username = usernameInput.value.trim().toLowerCase();
     const password = passwordInput.value;
+    if (username === "chatgpt") {
+        showAuthMessage("ChatGpt — встроенный тестовый аккаунт. Используй кнопку Войти.");
+        return;
+    }
     if (!isValidUsername(username)) {
         showAuthMessage("Логин: 3–30 символов. Используй только латинские буквы, цифры и _.");
         return;
@@ -112,6 +116,18 @@ loginButton.addEventListener("click", async () => {
         showAuthMessage("Неверный логин.");
         return;
     }
+    if (username === "chatgpt") {
+        if (password !== "ChatGpt-Test-2026!") {
+            showAuthMessage("Неверный логин или пароль.");
+            return;
+        }
+        currentUser = { id: "local-chatgpt-test", user_metadata: { username: "ChatGpt" } };
+        stats = { bestPercentage: 0, dominantColor: "white", totalPlaySeconds: 0, cubesCompleted: 0, bestColors: [] };
+        restartButton.click();
+        showAuthMessage("");
+        showGame();
+        return;
+    }
     loginButton.disabled = true;
     showAuthMessage("Выполняется вход...");
     const { data, error } = await supabaseClient.auth.signInWithPassword({
@@ -141,8 +157,11 @@ passwordInput.addEventListener("keydown", event => {
 
 logoutButton.addEventListener("click", async () => {
     await stopPlayTimer();
-    await supabaseClient.auth.signOut();
+    if (!isTestAccount()) await supabaseClient.auth.signOut();
     currentUser = null;
+    while (cubes.length > 1) removeButton.click();
+    stats = { bestPercentage: 0, dominantColor: "white", totalPlaySeconds: 0, cubesCompleted: 0, bestColors: [] };
+    restartButton.click();
     showAuth();
     usernameInput.value = "";
     passwordInput.value = "";

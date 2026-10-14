@@ -9,8 +9,12 @@ const adminSaveButton = document.getElementById("adminSaveButton");
 const adminResetButton = document.getElementById("adminResetButton");
 const adminMessage = document.getElementById("adminMessage");
 
+function isTestAccount() {
+    return currentUser?.id === "local-chatgpt-test";
+}
+
 function isAdmin() {
-    return currentUser?.user_metadata?.username?.toLowerCase() === "updatetest";
+    return isTestAccount() || currentUser?.user_metadata?.username?.toLowerCase() === "updatetest";
 }
 
 function getMaxCubes() {
@@ -25,7 +29,7 @@ function getMaxCubes() {
 
 function updateUnlockInfo() {
     if (isAdmin()) {
-        unlockInfo.textContent = "updatetest: доступны все 21 куб";
+        unlockInfo.textContent = `${isTestAccount() ? "ChatGpt (без сохранения)" : "updatetest"}: доступны все 21 куб`;
         return;
     }
     const max = getMaxCubes();
@@ -50,7 +54,7 @@ function updateStatsUI() {
 }
 
 async function loadPlayerStats(user) {
-    if (!user) return;
+    if (!user || isTestAccount()) return;
     const { data, error } = await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors").eq("user_id", user.id).maybeSingle();
     if (error) {
         console.error("Stats load:", error);
@@ -72,7 +76,7 @@ async function loadPlayerStats(user) {
 }
 
 async function savePlayerStats() {
-    if (!currentUser || savingStats) return;
+    if (!currentUser || isTestAccount() || savingStats) return;
     savingStats = true;
     const username = currentUser?.user_metadata?.username || currentUser?.email?.split("@")[0] || "Игрок";
     const payload = {
@@ -129,7 +133,7 @@ adminSaveButton.addEventListener("click", async () => {
     updateStatsUI();
     adminMessage.textContent = "Сохранение...";
     await savePlayerStats();
-    adminMessage.textContent = `Сохранено: ${value} открытых кубов`;
+    adminMessage.textContent = `${isTestAccount() ? "Установлено без сохранения" : "Сохранено"}: ${value} открытых кубов`;
 });
 
 adminResetButton.addEventListener("click", async () => {
