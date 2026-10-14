@@ -1,5 +1,5 @@
 const DONUT_INTERVAL = 5 * 60 * 1000;
-const GOLDEN_DONUT_INTERVAL = 30 * 60 * 1000;
+const GOLDEN_DONUT_INTERVAL = 15 * 60 * 1000;
 const DONUT_BOOST_DURATION = 60 * 1000;
 const DONUT_VISIBLE_DURATION = 15 * 1000;
 const donutBoostInfo = document.getElementById("donutBoostInfo");
