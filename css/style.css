@@ -683,3 +683,16 @@ button:disabled {
     #gameArea{left:240px;right:200px;top:60px;bottom:8px;width:auto;height:auto;transform:none}
     #donutBoostInfo{top:8px;font-size:14px}
 }
+
+/* Место для «← FreasyGames» в левом верхнем углу. */
+#playerStats{top:56px}
+#authScreen{padding-top:56px}
+@media(max-width:600px) and (orientation:portrait){
+    #playerStats{top:54px}
+    #unlockInfo{top:154px}
+    #gameArea{top:194px;height:calc(100dvh - 194px - 285px)}
+}
+@media(max-height:520px) and (orientation:landscape){
+    #playerStats{top:8px}
+    .fg-back{left:50% !important;transform:translateX(-50%)}
+}
