@@ -8,6 +8,17 @@ const backToLogin = document.getElementById("backToLogin");
 const registerText = document.getElementById("registerText");
 const authMessage = document.getElementById("authMessage");
 const logoutButton = document.getElementById("logoutButton");
+const offlineButton = document.getElementById("offlineButton");
+
+async function startOffline() {
+    try { localStorage.setItem(GUEST_ACTIVE_KEY, "1"); } catch {}
+    currentUser = { id: GUEST_ID, user_metadata: { username: "Офлайн-режим" } };
+    await loadPlayerStats(currentUser);
+    showAuthMessage("");
+    showGame();
+}
+
+offlineButton.addEventListener("click", startOffline);
 
 function showAuthMessage(message) {
     authMessage.textContent = message;
@@ -157,7 +168,9 @@ passwordInput.addEventListener("keydown", event => {
 
 logoutButton.addEventListener("click", async () => {
     await stopPlayTimer();
-    if (!isTestAccount()) await supabaseClient.auth.signOut();
+    if (isGuest()) {
+        try { localStorage.removeItem(GUEST_ACTIVE_KEY); } catch {}
+    } else if (!isTestAccount()) await supabaseClient.auth.signOut();
     currentUser = null;
     while (cubes.length > 1) removeButton.click();
     stats = { bestPercentage: 0, dominantColor: "white", totalPlaySeconds: 0, cubesCompleted: 0, bestColors: [] };
@@ -169,6 +182,12 @@ logoutButton.addEventListener("click", async () => {
 });
 
 async function checkSession() {
+    let guest = false;
+    try { guest = localStorage.getItem(GUEST_ACTIVE_KEY) === "1"; } catch {}
+    if (guest) {
+        await startOffline();
+        return;
+    }
     const { data } = await supabaseClient.auth.getSession();
     if (data.session) {
         currentUser = data.session.user;

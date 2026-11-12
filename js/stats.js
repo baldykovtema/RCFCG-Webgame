@@ -9,6 +9,15 @@ const adminSaveButton = document.getElementById("adminSaveButton");
 const adminResetButton = document.getElementById("adminResetButton");
 const adminMessage = document.getElementById("adminMessage");
 
+const GUEST_ID = "offline-guest";
+const GUEST_STATS_KEY = "rcfcgGuestStats";
+const GUEST_ACTIVE_KEY = "rcfcgGuestActive";
+
+// Офлайн-режим: играть без аккаунта, прогресс хранится только на этом устройстве.
+function isGuest() {
+    return currentUser?.id === GUEST_ID;
+}
+
 function isTestAccount() {
     return currentUser?.id === "local-chatgpt-test";
 }
@@ -54,6 +63,12 @@ function updateStatsUI() {
 }
 
 async function loadPlayerStats(user) {
+    if (isGuest()) {
+        stats = { bestPercentage: 0, dominantColor: "white", totalPlaySeconds: 0, cubesCompleted: 0, bestColors: [] };
+        try { Object.assign(stats, JSON.parse(localStorage.getItem(GUEST_STATS_KEY) || "{}")); } catch {}
+        updateStatsUI();
+        return;
+    }
     if (!user || isTestAccount()) return;
     const { data, error } = await supabaseClient.from("leaderboard").select("username,best_percentage,dominant_color,total_play_seconds,cubes_completed,colors").eq("user_id", user.id).maybeSingle();
     if (error) {
@@ -76,6 +91,10 @@ async function loadPlayerStats(user) {
 }
 
 async function savePlayerStats() {
+    if (isGuest()) {
+        try { localStorage.setItem(GUEST_STATS_KEY, JSON.stringify(stats)); } catch {}
+        return;
+    }
     if (!currentUser || isTestAccount() || savingStats) return;
     savingStats = true;
     const username = currentUser?.user_metadata?.username || currentUser?.email?.split("@")[0] || "Игрок";

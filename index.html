@@ -5,8 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>RCFCG</title>
-    <link rel="stylesheet" href="css/style.css?v=back1">
+    <link rel="stylesheet" href="css/style.css?v=offline1">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-fallback.js"></script>
 </head>
 
 <body>
@@ -22,6 +23,8 @@
             <button id="registerButton">Зарегистрироваться</button>
             <button id="backToLogin">Назад</button>
             <div id="authMessage"></div>
+            <button id="offlineButton" type="button">⚡ Офлайн-режим — без аккаунта</button>
+            <div id="offlineNote">Прогресс сохранится только на этом устройстве</div>
         </div>
     </div>
     <div id="game">
@@ -104,15 +107,15 @@
         <div id="leaderboardMessage"></div>
         <button id="leaderboardBack">Назад</button>
     </div>
-    <script src="js/config.js?v=773805e"></script>
-    <script src="js/utils.js?v=773805e"></script>
-    <script src="js/state.js?v=773805e"></script>
-    <script src="js/stats.js?v=773805e"></script>
-    <script src="js/cubes.js?v=773805e"></script>
-    <script src="js/donut.js?v=773805e"></script>
-    <script src="js/auth.js?v=773805e"></script>
-    <script src="js/leaderboard.js?v=773805e"></script>
-    <script src="js/main.js?v=773805e"></script>
+    <script src="js/config.js?v=offline1"></script>
+    <script src="js/utils.js?v=offline1"></script>
+    <script src="js/state.js?v=offline1"></script>
+    <script src="js/stats.js?v=offline1"></script>
+    <script src="js/cubes.js?v=offline1"></script>
+    <script src="js/donut.js?v=offline1"></script>
+    <script src="js/auth.js?v=offline1"></script>
+    <script src="js/leaderboard.js?v=offline1"></script>
+    <script src="js/main.js?v=offline1"></script>
 <script src="https://baldykovtema.github.io/FreasyGames/shared/back.js" data-href="https://baldykovtema.github.io/FreasyGames/"></script>
 </body>
 
