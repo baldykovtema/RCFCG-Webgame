@@ -33,8 +33,23 @@ function getMaxCubes() {
         if (stats.cubesCompleted >= UNLOCKS[i]) unlocked = i;
         else break;
     }
-    return unlocked;
+    return Math.min(MAX_CUBES, unlocked + (Date.now() < bonusCubeUntil ? 1 : 0));
 }
+
+// An ad opens one more cube for ten minutes.
+let bonusCubeUntil = 0;
+const cubeAd = window.FreasyRewards ? FreasyRewards.offer({
+    host: "#controls", before: "#restart", name: "rcfcg-cube", label: "🎬 +1 куб на 10 минут",
+    onReward: () => { bonusCubeUntil = Date.now() + 10 * 60 * 1000; updateButtons(); updateUnlockInfo(); }
+}) : null;
+if (cubeAd) Object.assign(cubeAd.button.style, { width: "auto", margin: "0", padding: "10px 16px", fontSize: "14px" });
+setInterval(() => {
+    if (!cubeAd) return;
+    const has = Date.now() < bonusCubeUntil;
+    if (has || getMaxCubes() >= MAX_CUBES) cubeAd.hide(); else cubeAd.show();
+    if (bonusCubeUntil && !has) { bonusCubeUntil = 0; updateButtons(); updateUnlockInfo(); }
+}, 3000);
+
 
 function updateUnlockInfo() {
     if (isAdmin()) {
